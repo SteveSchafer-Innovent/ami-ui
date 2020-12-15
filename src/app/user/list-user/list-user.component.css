@@ -1,0 +1,16 @@
+.user-container {
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+}
+.btn-simple {
+	border: 1px solid #ccc;
+	width: .8in;
+}
+table tr td.buttons button:nth-child(n+2) {
+	margin-left: 6px;
+}
+table tr td.buttons {
+	white-space: nowrap;
+	text-align: right;
+}

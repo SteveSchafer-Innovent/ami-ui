@@ -1,0 +1,43 @@
+.thing-container {
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+}
+div.attrdefn-label {
+	font-size: small;
+}
+div.attrdefn-value {
+	border: 1px solid #ccc;
+	padding: 6px;
+}
+div.rich-text-small {
+  height: 200px;
+  overflow: auto;
+}
+div.rich-text-large {
+}
+div.buttons {
+	margin-top: 20px;
+}
+div.attrdefn-value button:nth-child(n+2) {
+	margin-top: 0px;
+}
+div.attrdefn-value *:nth-child(n+2) {
+	margin-top: 10px;
+}
+div.attrdefn-value table {
+	width: 100%;
+}
+button.simple-btn {
+	border: 1px solid #ccc;
+}
+div.thing-container div button, input {
+	margin-right: 6px;
+	margin-bottom: 6px;
+}
+div.file div.attrdefn-value:nth-child(n+2) {
+	margin-top: 10px;
+}
+div.file button {
+	margin-top: 10px;
+}

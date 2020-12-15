@@ -1,0 +1,70 @@
+<div class="col-md-6 thing-container">
+  <h2 class="text-center">{{getTitle()}}</h2>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="form-group" *ngFor="let attrdefn of attrdefns; trackBy: trackAttrDefn">
+      <div class="name">
+        {{attrdefn.name}}
+      </div>
+      <div class="value">
+        <input type="text" [formControl]="attrdefn.formControl" *ngIf="attrdefn.handler == 'string'"
+          class="string" placeholder="text">
+        <textarea [formControl]="attrdefn.formControl" *ngIf="attrdefn.handler == 'long-string'"
+          class="string" placeholder="long text"></textarea>
+        <input type="text" [formControl]="attrdefn.formControl" *ngIf="attrdefn.handler == 'url'"
+          class="url" placeholder="url">
+        <input type="text" [formControl]="attrdefn.formControl" *ngIf="attrdefn.handler == 'float'"
+          placeholder="number">
+        <input type="text" [formControl]="attrdefn.formControl" *ngIf="attrdefn.handler == 'integer'"
+          placeholder="integer">
+        <input type="checkbox" [formControl]="attrdefn.formControl" *ngIf="attrdefn.handler == 'boolean'">
+        <input type="text" [owlDateTimeTrigger]="dtPicker" [owlDateTime]="dtPicker" [formControl]="attrdefn.formControl"
+          placeholder="date time" *ngIf="attrdefn.handler == 'datetime'">
+        <owl-date-time #dtPicker></owl-date-time>
+        <ngContainer *ngIf="attrdefn.handler == 'file'">
+          <div *ngIf="attrdefn.formControl.value != null && attrdefn.formControl.value.filename != null"
+              style="margin-bottom: 5px;">
+            <span style="font-weight: bold; margin-right: 20px; ">{{attrdefn.formControl.value.filename}}</span>
+            <button type="button" class="btn" (click)="downloadFile(attrdefn)"
+                style="border: 1px solid #bbb; ">
+              Download
+            </button>
+            <button type="botton" class="btn" (click)="removeFile(attrdefn)"
+                style="border: 1px solid #bbb; margin-left: 10px; ">
+              Remove
+            </button>
+          </div>
+          <div *ngIf="attrdefn.formControl.value.richText != null && attrdefn.formControl.value.richText != ''"
+            [innerHTML]="attrdefn.formControl.value.richText"
+            class="rich-text" style="margin-bottom: 5px; ">
+          </div>
+          <div *ngIf="attrdefn.image != null" style="margin-bottom: 5px; ">
+            <img [src]="attrdefn.image">
+          </div>
+          <div class="uploadfilecontainer" (click)="fileInput.click()" appDragDrop
+              (onFileDropped)="uploadFile($event, attrdefn)">
+            <div *ngIf="attrdefn.filesToUpload == null || attrdefn.filesToUpload.length == 0">
+              Drop file here or click to upload a new file.
+            </div>
+            <div *ngIf="attrdefn.filesToUpload != null && attrdefn.filesToUpload.length >= 1">
+              {{attrdefn.filesToUpload[0].name}}
+            </div>
+            <input hidden type="file" #fileInput (change)="uploadFile($event.target.files, attrdefn)">
+          </div>
+        </ngContainer>
+        <ckeditor *ngIf="attrdefn.handler == 'rich-text'" [editor]="Editor"
+          [(ngModel)]="attrdefn.richTextModel.editorData" [ngModelOptions]="{standalone: true}"
+          [config]="editorConfig"></ckeditor>
+        <div [formArray]="attrdefn.formArray" *ngIf="attrdefn.handler == 'link'" class="links">
+          <div *ngFor="let formControl of attrdefn.formArray.controls">
+            <select [formControl]="formControl">
+              <option value="0">none</option>
+              <option [value]="thing.id" *ngFor="let thing of attrdefn.things">{{thing.presentation}}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button class="btn btn-success" type="submit">Submit</button>
+    <button class="btn btn-success" style="margin-left: 20px;" type="button" (click)="cancel()">Cancel</button>
+  </form>
+</div>

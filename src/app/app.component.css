@@ -1,0 +1,15 @@
+.navbar-dark {
+}
+.nav-link {
+	display: inline;
+}
+.navbar-dark .navbar-nav .nav-link {
+	color: #666;
+}
+.nav-item {
+	display: inline;
+	padding-right: 10px;
+}
+.navbar-nav {
+	display: inline;
+}

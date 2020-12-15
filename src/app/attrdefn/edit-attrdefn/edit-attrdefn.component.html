@@ -1,0 +1,47 @@
+<div class="col-md-4 attrdefn-container">
+  <h2 class="text-center">{{getTitle()}}</h2>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+    <div class="form-group">
+      <label for="name">Name:</label>
+      <input type="text" formControlName="name" placeholder="name" name="name" class="form-control" id="name">
+    </div>
+
+    <div class="form-group">
+      <label for="handler">Handler:</label>
+      <select formControlName="handler" name="handler" id="handler" class="form-control">
+        <option [value]="handler" *ngFor="let handler of handlers">{{handler}}</option>
+      </select>
+    </div>
+
+    <div class="form-group" *ngIf="form.value.handler == 'link'">
+      <label for="targetTypeId">Target Type:</label>
+      <select formControlName="targetTypeId" name="targetTypeId" id="targetTypeId" class="form-control">
+        <option [value]="type.id" *ngFor="let type of types">{{type.name}}</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="multiple">Multiple:</label>
+      <input type="checkbox" formControlName="multiple" name="multiple" id="multiple" class="form-control">
+    </div>
+
+    <div class="form-group">
+      <label for="showInList">Show in List:</label>
+      <input type="checkbox" formControlName="showInList" name="showInList" id="showInList" class="form-control">
+    </div>
+
+    <div class="form-group">
+      <label for="editInList">Edit in List:</label>
+      <input type="checkbox" formControlName="editInList" name="editInList" id="editInList" class="form-control">
+    </div>
+
+    <div class="form-group">
+      <label for="order">Order:</label>
+      <input type="text" formControlName="order" name="order" id="order" class="form-control">
+    </div>
+
+    <button class="btn btn-success">Submit</button>
+    <button class="btn btn-success" style="margin-left: 20px; " type="button" (click)="cancel()">Cancel</button>
+  </form>
+</div>

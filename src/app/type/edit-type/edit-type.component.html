@@ -1,0 +1,13 @@
+<div class="col-md-4 type-container">
+  <h2 class="text-center">{{getTitle()}}</h2>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+    <div class="form-group">
+      <label for="name">Name:</label>
+      <input type="text" formControlName="name" placeholder="name" name="name" class="form-control" id="name">
+    </div>
+
+    <button class="btn btn-success">Submit</button>
+    <button class="btn btn-success" style="margin-left: 20px; " type="button" (click)="cancel()">Cancel</button>
+  </form>
+</div>

@@ -1,0 +1,59 @@
+<div class="col-md-8 list-thing-container">
+  <h2 style="margin: auto"> {{getTitle()}}</h2>
+  <button class="btn btn-danger" style="width:100px" (click)="add()"> Add</button>
+  <table class="table table-striped">
+    <thead>
+    <tr>
+      <th *ngIf="hasName" (click)="sortName()">Name</th>
+      <th (click)="sortCreated()">Created</th>
+      <th *ngFor="let attrdefn of getVisibleAttrDefns()" (click)="sort(attrdefn)">
+        {{attrdefn.name}}
+      </th>
+      <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let thing of things">
+      <td *ngIf="hasName">{{thing.name}}</td>
+      <td>{{thing.created | date: 'yyyy-MM-dd HH:mm:ss'}}</td>
+      <td *ngFor="let attrdefn of getVisibleAttrDefns()">
+        <ngContainer *ngIf="attrdefn.editInList">
+          <input type="text" *ngIf="attrdefn.handler == 'string'" [value]="thing.attributes[attrdefn.name].value"
+            class="string" (change)="change(thing, attrdefn, $event.target.value)">
+          <input type="text" *ngIf="attrdefn.handler == 'url'" [value]="thing.attributes[attrdefn.name].value"
+            class="url" (change)="change(thing, attrdefn, $event.target.value)">
+          <input type="text" *ngIf="attrdefn.handler == 'float'" [value]="thing.attributes[attrdefn.name].value"
+            (change)="change(thing, attrdefn, $event.target.value)">
+          <input type="text" *ngIf="attrdefn.handler == 'integer'" [value]="thing.attributes[attrdefn.name].value"
+            (change)="change(thing, attrdefn, $event.target.value)">
+          <input type="checkbox" *ngIf="attrdefn.handler == 'boolean'" value="true"
+            [checked]="thing.attributes[attrdefn.name].value ? 'checked' : ''"
+            (change)="change(thing, attrdefn, $event.target.checked)">
+        </ngContainer>
+        <ngContainer *ngIf="attrdefn.showInList && !attrdefn.editInList">
+          <div *ngIf="attrdefn.handler == 'string' || attrdefn.handler == 'url' || attrdefn.handler == 'float' || attrdefn.handler == 'integer'">{{thing.attributes[attrdefn.name].value}}</div>
+          <div *ngIf="attrdefn.handler == 'long-string'"><ngx-md>{{thing.attributes[attrdefn.name].value}}</ngx-md></div>
+          <div *ngIf="attrdefn.handler == 'datetime'">{{thing.attributes[attrdefn.name].value | date: 'yyyy-MM-dd HH:mm'}}</div>
+          <div *ngIf="attrdefn.handler == 'boolean'">{{thing.attributes[attrdefn.name].value ? 'true' : 'false'}}</div>
+          <div *ngIf="attrdefn.handler == 'link'">
+            <span *ngFor="let thing of thing.attributes[attrdefn.name].linkedThings">
+              <button type="button" class="btn simple-btn" (click)="view(thing)">{{thing.presentation}}</button>
+            </span>
+          </div>
+        </ngContainer>
+      </td>
+      <td class="buttons">
+        <button class="btn btn-success" (click)="view(thing)"> View</button>
+        <button class="btn btn-success" (click)="delete(thing)"> Delete</button>
+        <button class="btn btn-success" (click)="edit(thing)"> Edit</button>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+  <div>
+    <button *ngFor="let breadcrumb of getBreadcrumbs()" class="btn btn-success" type="button"
+        (click)="gotoBreadcrumb(breadcrumb)">{{breadcrumb.getButtonName()}}</button>
+    <button class="btn btn-success" type="button" (click)="gotoTypes()">Types</button>
+    <button class="btn btn-success" type="button" (click)="gotoAttrDefns()">Attributes</button>
+  </div>
+</div>

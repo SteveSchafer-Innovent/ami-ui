@@ -1,0 +1,11 @@
+<nav class="navbar navbar-fixed-top navbar-dark bg-inverse" *ngIf="navbarVisible()">
+  <div class="container">
+    <ul class="nav navbar-nav" routerLinkActive="active">
+      <li class="nav-item"><a class="nav-link" routerLink="list-user">Users</a></li>
+      <li class="nav-item"><a class="nav-link" routerLink="list-type">Types</a></li>
+      <li class="nav-item"><a class="nav-link" routerLink="search">Search</a></li>
+      <li class="nav-item"><a class="nav-link" (click)="logout()" style="cursor: pointer; ">Logout</a></li>
+    </ul>
+  </div>
+</nav>
+<router-outlet></router-outlet>

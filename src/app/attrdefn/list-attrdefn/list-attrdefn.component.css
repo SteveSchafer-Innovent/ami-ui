@@ -1,0 +1,16 @@
+.list-attrdefn-container {
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+}
+table tr td.buttons {
+	white-space: nowrap;
+	text-align: right;
+}
+table tr td.buttons button:nth-child(n+2) {
+	margin-left: 6px;
+}
+div.list-attrdefn-container div button, input {
+	margin-right: 6px;
+	margin-bottom: 6px;
+}

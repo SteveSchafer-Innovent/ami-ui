@@ -1,0 +1,27 @@
+<div class="col-md-6 list-attrdefn-container">
+  <h2 style="margin: auto">{{getTitle()}}</h2>
+  <button class="btn btn-danger" style="width:100px" (click)="add()"> Add</button>
+  <table class="table table-striped">
+    <thead>
+    <tr>
+      <th>Name</th>
+      <th>Handler</th>
+      <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let attrdefn of attrdefns">
+      <td>{{attrdefn.name}}</td>
+      <td>{{attrdefn.handler}}</td>
+      <td class="buttons">
+        <button class="btn btn-success" (click)="delete(attrdefn)"> Delete</button>
+        <button class="btn btn-success" (click)="edit(attrdefn)"> Edit</button>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+  <div class="buttons">
+    <button class="btn btn-success" type="button" (click)="gotoTypes()">Types</button>
+    <button class="btn btn-success" type="button" (click)="gotoThings()">Things</button>
+  </div>
+</div>

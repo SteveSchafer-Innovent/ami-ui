@@ -1,0 +1,22 @@
+.list-thing-container {
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+}
+div.list-thing-container div button, input {
+	margin-right: 6px;
+	margin-bottom: 6px;
+}
+button.simple-btn {
+	border: 1px solid #ccc;
+}
+table tr td.buttons button:nth-child(n+2) {
+	margin-left: 6px;
+}
+table tr td.buttons {
+	white-space: nowrap;
+	text-align: right;
+}
+table tr th {
+	cursor: pointer;
+}

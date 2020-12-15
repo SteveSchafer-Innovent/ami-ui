@@ -1,0 +1,58 @@
+.thing-container {
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+}
+
+.uploadfilecontainer {
+    background-image: url("../../../assets/cloud-2044823_960_720.png");
+    background-repeat: no-repeat;
+    background-size: 100px;
+    background-position: center;
+    height: 200px;
+    width: 100%;
+    margin: 0px auto;
+    border: 2px dashed #1C8ADB;
+    border-radius: 10px;
+    text-align: center;
+    padding-top: 10px;
+}
+
+.uploadfilecontainer:hover {
+    cursor: pointer;
+    background-color: #9ecbec !important;
+    opacity: 0.8;
+}
+
+input.string {
+	width: 100%;
+}
+
+input.url {
+	width: 100%;
+}
+
+textarea {
+	width: 100%;
+	padding-top: 5px;
+	padding-left: 10px;
+}
+
+:host ::ng-deep .ck-editor__editable_inline {
+    min-height: 200px;
+}
+
+div.rich-text {
+  height: 200px;
+  overflow: auto;
+  border: 1px solid #ccc;
+}
+
+div.name {
+	font-size: small;
+}
+div.value {
+}
+div.links div:nth-child(n+2) {
+	margin-top: 10px;
+}

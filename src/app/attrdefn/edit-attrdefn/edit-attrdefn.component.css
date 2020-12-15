@@ -1,0 +1,11 @@
+.attrdefn-container {
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+}
+div.form-group input[type=checkbox] {
+	margin-left: 10px;
+}
+div.form-group label {
+	font-size: small;
+}
