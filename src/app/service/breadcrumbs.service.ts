@@ -22,26 +22,55 @@ export class Breadcrumb {
 
 @Injectable()
 export class Breadcrumbs {
-  breadcrumbs: Breadcrumb[] = [];
+  private breadcrumbs: Breadcrumb[] = [];
 
   public push(breadcrumb: Breadcrumb): void {
-    this.breadcrumbs.push(breadcrumb);
+    let breadcrumbs = this.getBreadcrumbs();
+    breadcrumbs.push(breadcrumb);
+    this.saveBreadcrumbs(breadcrumbs);
   }
 
   public pop(): Breadcrumb {
-    return this.breadcrumbs.pop();
+    let breadcrumbs = this.getBreadcrumbs();
+    let breadcrumb: Breadcrumb = breadcrumbs.pop();
+    this.saveBreadcrumbs(breadcrumbs);
+    return breadcrumb;
   }
 
   public clear(breadcrumb?: Breadcrumb): void {
+    let breadcrumbs = this.getBreadcrumbs();
     if(breadcrumb) {
-      let i = indexOf(this.breadcrumbs, breadcrumb);
-      console.log('clearBreadcrumbs', this.breadcrumbs, breadcrumb, i);
+      let i = indexOf(breadcrumbs, breadcrumb);
+      console.log('clearBreadcrumbs', breadcrumbs, breadcrumb, i);
       if(i >= 0) {
-        this.breadcrumbs.length = i;
+        breadcrumbs.length = i;
       }
     }
     else {
-      this.breadcrumbs = [];
+      breadcrumbs = [];
     }
+    this.saveBreadcrumbs(breadcrumbs);
+  }
+
+  public getBreadcrumbs(): Breadcrumb[] {
+    let breadcrumbsString = window.localStorage.getItem('breadcrumbs');
+    console.log('breadcrumbsString', breadcrumbsString);
+    if(breadcrumbsString) {
+      this.breadcrumbs = [];
+      let array = JSON.parse(breadcrumbsString);
+      for(let obj of array) {
+        let breadcrumb = new Breadcrumb(obj.name, obj.params, obj.context, obj.buttonName);
+        this.breadcrumbs.push(breadcrumb);
+      }
+    } 
+    else {
+      this.breadcrumbs = null;
+    }
+    return this.breadcrumbs;
+  }
+
+  private saveBreadcrumbs(breadcrumbs: Breadcrumb[]): void {
+    this.breadcrumbs = breadcrumbs;
+    window.localStorage.setItem('breadcrumbs', JSON.stringify(breadcrumbs));
   }
 }

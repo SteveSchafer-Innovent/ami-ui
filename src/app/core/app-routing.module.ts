@@ -6,6 +6,7 @@ import { LoginComponent } from '../login/login.component';
 import { ListUserComponent } from "../user/list-user/list-user.component";
 import { AddUserComponent } from "../user/add-user/add-user.component";
 import { EditUserComponent } from "../user/edit-user/edit-user.component";
+import { ChangePasswordComponent } from '../user/password/change-password.component';
 import { ListTypeComponent } from "../type/list-type/list-type.component";
 import { EditTypeComponent } from "../type/edit-type/edit-type.component";
 import { ListAttrDefnComponent } from "../attrdefn/list-attrdefn/list-attrdefn.component";
@@ -19,6 +20,7 @@ const routes: Routes = [
   { path: 'list-user', component: ListUserComponent },
   { path: 'add-user', component: AddUserComponent },
   { path: 'edit-user', component: EditUserComponent },
+  { path: 'change-password', component: ChangePasswordComponent },
   { path: 'list-type', component: ListTypeComponent },
   { path: 'edit-type', component: EditTypeComponent },
   { path: 'list-attrdefn', component: ListAttrDefnComponent },
@@ -26,7 +28,7 @@ const routes: Routes = [
   { path: 'list-thing', component: ListThingComponent },
   { path: 'edit-thing', component: EditThingComponent },
   { path: 'view-thing', component: ViewThingComponent },
-  { path: '', component: environment.username == null ? LoginComponent : ListTypeComponent }
+  { path: '', component: ListTypeComponent }
 ];
 
 @NgModule({

@@ -556,7 +556,7 @@ export class ViewThingComponent implements OnInit {
   }
 
   getBreadcrumbs(): Breadcrumb[] {
-    return this.breadcrumbs.breadcrumbs;
+    return this.breadcrumbs.getBreadcrumbs();
   }
 
   gotoBreadcrumb(breadcrumb: Breadcrumb): void {

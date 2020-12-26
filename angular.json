@@ -56,42 +56,6 @@
                   "maximumError": "10kb"
                 }
               ]
-            },
-            "steve": {
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.steve.ts"
-                }
-              ],
-              "optimization": true,
-              "outputHashing": "all",
-              "sourceMap": false,
-              "extractCss": true,
-              "namedChunks": false,
-              "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true,
-              "budgets": [
-                {
-                  "type": "initial",
-                  "maximumWarning": "2mb",
-                  "maximumError": "5mb"
-                },
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "6kb",
-                  "maximumError": "10kb"
-                }
-              ]
-            },
-            "dev-remote": {
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.dev-remote.ts"
-                }
-              ],
             }
           }
         },
@@ -103,12 +67,6 @@
           "configurations": {
             "production": {
               "browserTarget": "ami-ui:build:production"
-            },
-            "steve": {
-              "browserTarget": "ami-ui:build:steve"
-            },
-            "dev-remote": {
-              "browserTarget": "ami-ui:build:dev-remote"
             }
           }
         },
@@ -157,12 +115,6 @@
           "configurations": {
             "production": {
               "devServerTarget": "ami-ui:serve:production"
-            },
-            "steve": {
-              "devServerTarget": "ami-ui:serve:steve"
-            },
-            "dev-remote": {
-              "devServerTarget": "ami-ui:serve:dev-remote"
             }
           }
         }

@@ -16,10 +16,20 @@ export class ListThingContextService {
 
   setContext(context: ListThingContext): void {
     this.context = context;
+    if(context) {
+      window.localStorage.setItem('thing-context', JSON.stringify(context));
+    }
+    else {
+      window.localStorage.removeItem('thing-context');
+    }
   }
 
   getContext(): ListThingContext {
     let context = this.context;
+    if(context == null) {
+      let contextString = window.localStorage.getItem('thing-context');
+      context = contextString == null ? null : JSON.parse(contextString);
+    }
     this.context = null;
     return context;
   }

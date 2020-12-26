@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from "@angular/router";
+import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
 
-import { environment } from '../../../environments/environment';
 import { Type } from "../../model/type.model";
 import { ApiService } from "../../service/api.service";
 import { ListThingContextService } from "../../service/list-thing-context.service";
@@ -23,52 +23,25 @@ export class ListTypeComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    let component = this;
-    function loadPage(): void {
-      component.apiService.getTypes().subscribe( data => {
-        console.log('ListTypeComponent.ngOnInit.loadPage data', data);
-        if(data.status === 401) {
-          console.log('removing token');
-          window.localStorage.removeItem('token');
-          component.router.navigate(['list-type']);
-        }
-        if(data.status != 200) {
-          alert(`Failed to load ListTypeComponent: ${data.message}`);
-          return;
-        }
-        component.types = data.result;
-      });
+    if(!window.localStorage.getItem('token')) {
+      this.router.navigate(['login']);
+      return;
     }
-    if(environment.username != null) {
-      if(!window.localStorage.getItem('token')) {
-        console.log(environment.username);
-        const loginPayload = {
-          username: environment.username,
-          password: environment.password
-        }
-        this.apiService.login(loginPayload).subscribe(data => {
-          if(data.status === 200) {
-            window.localStorage.setItem('token', data.result.token);
-            loadPage();
-          }
-          else {
-            alert(data.message);
-          }
-        });
+    this.breadcrumbs.clear();
+    this.listThingContextService.setContext(null);
+    this.apiService.getTypes().subscribe( data => {
+      console.log('ListTypeComponent.ngOnInit.loadPage data', data);
+      if(data.status === 401) {
+        console.log('removing token');
+        window.localStorage.removeItem('token');
+        this.router.navigate(['list-type']);
       }
-      else {
-        loadPage();
+      if(data.status != 200) {
+        alert(`Failed to load ListTypeComponent: ${data.message}`);
+        return;
       }
-    }
-    else {
-      if(!window.localStorage.getItem('token')) {
-        alert("token not found");
-        this.router.navigate(['login']);
-      }
-      else {
-        loadPage();
-      }
-    }
+      this.types = data.result;
+    });
   }
 
   deleteType(type: Type): void {
@@ -96,7 +69,10 @@ export class ListTypeComponent implements OnInit {
   }
 
   things(type: Type): void {
-    this.breadcrumbs.clear();
     this.router.navigate(['list-thing', { 'typeId': type.id }]);
+  }
+
+  drop(event: CdkDragDrop<string[]>) {
+    moveItemInArray(this.types, event.previousIndex, event.currentIndex);
   }
 }

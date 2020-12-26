@@ -31,14 +31,14 @@ export class LoginComponent implements OnInit {
       password: this.loginForm.controls.password.value
     }
     this.apiService.login(loginPayload).subscribe(data => {
-      if(data.status === 200) {
-        window.localStorage.setItem('token', data.result.token);
-        this.router.navigate(['list-type']);
-      }
-      else {
+      if(data.status != 200) {
         this.invalidLogin = true;
         alert(data.message);
+        return;        
       }
+      window.localStorage.setItem('token', data.result.token);
+      window.localStorage.setItem('context', data.result.context);
+      this.router.navigate(['list-type']);
     });
   }
 }

@@ -17,7 +17,9 @@ import { Attribute } from "../model/attribute.model";
 export class ApiService {
   baseUrl: string = `http://${environment.host}:${environment.port}`;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {
+    console.log('constructing ApiService', http);
+  }
 
   login(loginPayload) : Observable<ApiResponse> {
     return this.http.post<ApiResponse>(`${this.baseUrl}/token/generate-token`, loginPayload);
@@ -42,7 +44,7 @@ export class ApiService {
   }
 
   getUserById(id: number): Observable<ApiResponse> {
-    return this.http.get<ApiResponse>(`${this.baseUrl}/users/${id}`).pipe(
+    return this.http.get<ApiResponse>(`${this.baseUrl}/user/${id}`).pipe(
       catchError(val => {
         this.handleError(val);
         return of(val);
@@ -51,7 +53,7 @@ export class ApiService {
   }
 
   createUser(user: User): Observable<ApiResponse> {
-    return this.http.post<ApiResponse>(`${this.baseUrl}/users/`, user).pipe(
+    return this.http.post<ApiResponse>(`${this.baseUrl}/user/`, user).pipe(
       catchError(val => {
         this.handleError(val);
         return of(val);
@@ -60,7 +62,34 @@ export class ApiService {
   }
 
   updateUser(user: User): Observable<ApiResponse> {
-    return this.http.put<ApiResponse>(`${this.baseUrl}/users/${user.id}`, user).pipe(
+    return this.http.put<ApiResponse>(`${this.baseUrl}/user`, user).pipe(
+      catchError(val => {
+        this.handleError(val);
+        return of(val);
+      })
+    );
+  }
+
+  changePassword(form: {password: string}): Observable<ApiResponse> {
+    return this.http.put<ApiResponse>(`${this.baseUrl}/user/password`, form).pipe(
+      catchError(val => {
+        this.handleError(val);
+        return of(val);
+      })
+    );
+  }
+
+  getContext(): Observable<ApiResponse> {
+    return this.http.get<ApiResponse>(`${this.baseUrl}/user/context`).pipe(
+      catchError(val => {
+        this.handleError(val);
+        return of(val);
+      })
+    );
+  }
+
+  setContext(context: string): Observable<ApiResponse> {
+    return this.http.put<ApiResponse>(`${this.baseUrl}/user/context`, {context: context}).pipe(
       catchError(val => {
         this.handleError(val);
         return of(val);
@@ -69,7 +98,7 @@ export class ApiService {
   }
 
   deleteUser(id: number): Observable<ApiResponse> {
-    return this.http.delete<ApiResponse>(`${this.baseUrl}/users/${id}`).pipe(
+    return this.http.delete<ApiResponse>(`${this.baseUrl}/user/${id}`).pipe(
       catchError(val => {
         this.handleError(val);
         return of(val);
@@ -96,8 +125,7 @@ export class ApiService {
   }
 
   saveThing(thing: Thing): Observable<ApiResponse> {
-    console.log('saveThing');
-    console.log(thing);
+    console.log('saveThing', thing);
     let url = `${this.baseUrl}/thing/`;
     let observable: Observable<ApiResponse> = null;
     if(thing.id == null) {
@@ -107,6 +135,17 @@ export class ApiService {
       observable = this.http.put<ApiResponse>(url, thing);
     }
     return observable.pipe(
+      catchError(val => {
+        this.handleError(val);
+        return of(val);
+      })
+    );
+  }
+
+  saveThingOrder(typeId: number, contextThingId: number, thingIds: number[]) {
+    console.log('saveThingOrder', typeId, contextThingId, thingIds);
+    let requestObj = {typeId: typeId, contextThingId: contextThingId, thingIds: thingIds};
+    return this.http.put<ApiResponse>(`${this.baseUrl}/thing/order`, requestObj).pipe(
       catchError(val => {
         this.handleError(val);
         return of(val);

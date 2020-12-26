@@ -20,6 +20,7 @@ import { LoginComponent } from './login/login.component';
 import { ListUserComponent } from './user/list-user/list-user.component';
 import { AddUserComponent } from './user/add-user/add-user.component';
 import { EditUserComponent } from './user/edit-user/edit-user.component';
+import { ChangePasswordComponent } from './user/password/change-password.component';
 import { ListTypeComponent } from './type/list-type/list-type.component';
 import { EditTypeComponent } from './type/edit-type/edit-type.component';
 import { ListAttrDefnComponent } from './attrdefn/list-attrdefn/list-attrdefn.component';
@@ -38,6 +39,7 @@ import { CapitalizePipe } from './capitalize.pipe'
     ListUserComponent,
     AddUserComponent,
     EditUserComponent,
+    ChangePasswordComponent,
     ListTypeComponent,
     EditTypeComponent,
     ListAttrDefnComponent,
