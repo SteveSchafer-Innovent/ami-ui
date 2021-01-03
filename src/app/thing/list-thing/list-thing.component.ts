@@ -1,7 +1,10 @@
-import { Component, OnInit, SecurityContext, Input } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute, ParamMap } from "@angular/router";
 import { formatDate, Location } from '@angular/common';
 import { DomSanitizer } from '@angular/platform-browser';
+import { MatIconRegistry } from '@angular/material/icon';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { MatTable } from '@angular/material/table';
 
 import { switchMap, catchError, retry } from 'rxjs/operators';
 
@@ -19,16 +22,21 @@ class MyAttrDefn extends AttrDefn {
   ascending: boolean;
 }
 
+class MyThing extends FindThingResult {
+  sortOrder: number
+}
+
 @Component({
   selector: 'app-list-thing',
   templateUrl: './list-thing.component.html',
   styleUrls: ['./list-thing.component.css']
 })
 export class ListThingComponent implements OnInit {
-  things: FindThingResult[];
+  things: FindThingResult[] = []; // init so table has some data
+  @ViewChild('table') table: MatTable<FindThingResult>;
+  displayedColumns: string[] = [];
   type: Type;
   attrdefns: MyAttrDefn[];
-  hasName: boolean;
   nameAttrDefn: MyAttrDefn;
   context: ListThingContext;
 
@@ -50,26 +58,12 @@ export class ListThingComponent implements OnInit {
     this.getParams();
   }
 
-  getAttrDefns(typeId: number): void {
-    this.apiService.getAttrDefns(typeId).subscribe( data => {
-      console.log('getAttrDefns data', data);
-      if(data.status != 200) {
-        alert(`Failed to get attribute definitions fortype ${typeId}: ${data.message}`);
-        return;
-      }
-      this.attrdefns = data.result;
-      this.hasName = false;
-      this.nameAttrDefn = null;
-      for(let attrdefn of this.attrdefns) {
-        attrdefn.sorted = false;
-        attrdefn.ascending = false;
-        if(attrdefn.name == 'name') {
-          this.hasName = true;
-          this.nameAttrDefn = attrdefn;
-          break;
-        }
-      }
-      this.load();
+  getParams(): void {
+    this.route.paramMap.subscribe((params: ParamMap) => {
+      let typeId = +params.get('typeId');
+      console.log(`list-thing typeId = ${typeId}`);
+      this.context = this.listThingContextService.getContext();
+      this.getType(typeId);
     });
   }
 
@@ -85,13 +79,42 @@ export class ListThingComponent implements OnInit {
     });
   }
 
-  getParams(): void {
-    this.route.paramMap.subscribe((params: ParamMap) => {
-      let typeId = +params.get('typeId');
-      console.log(`list-thing typeId = ${typeId}`);
-      this.context = this.listThingContextService.getContext();
-      this.getType(typeId);
+  getAttrDefns(typeId: number): void {
+    console.log(`enter getAttrDefns for typeId = ${typeId}`);
+    this.apiService.getAttrDefns(typeId).subscribe( data => {
+      console.log('ListThingComponent.getAttrDefns getAttrDefns data', data);
+      if(data.status != 200) {
+        alert(`Failed to get attribute definitions fortype ${typeId}: ${data.message}`);
+        return;
+      }
+      this.attrdefns = data.result;
+      let hasName = false;
+      this.nameAttrDefn = null;
+      for(let attrdefn of this.attrdefns) {
+        attrdefn.sorted = false;
+        attrdefn.ascending = false;
+        if(attrdefn.name == 'name') {
+          hasName = true;
+          this.nameAttrDefn = attrdefn;
+          break;
+        }
+      }
+      if(hasName) {
+        this.displayedColumns.push('name');
+      }
+      this.displayedColumns.push('created');
+      for(let attrdefn of this.attrdefns || []) {
+        if(attrdefn.showInList || attrdefn.editInList) {
+          if(!this.context || attrdefn.id != this.context.linkAttrDefn.id) {
+            this.displayedColumns.push(attrdefn.name);
+          }
+        }
+      }
+      this.displayedColumns.push('buttons');
+      console.log('displayedColumns', this.displayedColumns);
+      this.load();
     });
+    console.log(`exit getAttrDefns for typeId = ${typeId}`);
   }
 
   private load() {
@@ -125,6 +148,7 @@ export class ListThingComponent implements OnInit {
           });
         }
       };
+      let things: MyThing[] = [];
       for(let thing of data.result) {
         thing = new FindThingResult(this.apiService, thing);
         thing.attrs = {};
@@ -143,7 +167,7 @@ export class ListThingComponent implements OnInit {
             continue;
           }
         }
-        this.things.push(thing);
+        things.push(thing);
         for(let attrdefn of this.attrdefns) {
           if(attrdefn.handler == 'link' && attrdefn.showInList) {
             let attribute = thing.attributes[attrdefn.name];
@@ -152,6 +176,27 @@ export class ListThingComponent implements OnInit {
           }
         }
       }
+      let contextId = this.context ? this.context.linkedThing.id : null;
+      this.apiService.getThingOrder(this.type.id, contextId).subscribe( data => {
+        console.log('getThingOrder data', data);
+        if(data.status != 200) {
+          alert(`Failed to get thing order: ${data.message}`);
+          return;
+        }
+        let i = 0;
+        let thingMap = {};
+        for(let thingId of data.result) {
+          thingMap[thingId] = i++;
+        }
+        for(let thing of things) {
+          thing.sortOrder = thingMap[thing.id] || -1;
+        }
+        things.sort((a: MyThing, b: MyThing) => {
+          return a.sortOrder - b.sortOrder;
+        });
+        console.log('things', things);
+        this.things = things;
+      });
     });
   }
 
@@ -314,5 +359,20 @@ export class ListThingComponent implements OnInit {
         });
       }
     }
+  }
+
+  dropTable(event: CdkDragDrop<FindThingResult[]>) {
+    const prevIndex = this.things.findIndex(thing => thing === event.item.data);
+    moveItemInArray(this.things, prevIndex, event.currentIndex);
+    console.log('things', this.things);
+    this.table.renderRows();
+    let thingIds: number[] = [];
+    for(let thing of this.things) {
+      thingIds.push(thing.id);
+    }
+    let contextId = this.context == null ? null : this.context.linkedThing.id;
+    this.apiService.saveThingOrder(this.type.id, contextId, thingIds).subscribe( data => {
+      console.log('saveThingOrder data', data);
+    });
   }
 }

@@ -30,7 +30,8 @@ import { EditThingComponent } from './thing/edit-thing/edit-thing.component';
 import { ViewThingComponent } from './thing/view-thing/view-thing.component';
 import { DragDropDirective } from './dragdrop.directive';
 import { PluralizePipe } from './pluralize.pipe';
-import { CapitalizePipe } from './capitalize.pipe'
+import { CapitalizePipe } from './capitalize.pipe';
+import { SearchComponent } from './search/search.component';
 
 @NgModule({
   declarations: [
@@ -49,7 +50,8 @@ import { CapitalizePipe } from './capitalize.pipe'
     ViewThingComponent,
     DragDropDirective,
     PluralizePipe,
-    CapitalizePipe
+    CapitalizePipe,
+    SearchComponent
   ],
   imports: [
     BrowserModule,

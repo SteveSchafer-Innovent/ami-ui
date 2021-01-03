@@ -1,7 +1,56 @@
 <div class="col-md-8 list-thing-container">
   <h2 style="margin: auto"> {{getTitle()}}</h2>
   <button class="btn btn-danger" style="width:100px" (click)="add()"> Add</button>
-  <table class="table table-striped">
+  <!-- mat-elevation-z8 -->
+  <table mat-table #table [dataSource]="things" class="table table-striped" cdkDropList [cdkDropListData]="things" (cdkDropListDropped)="dropTable($event)">
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef>Name</th>
+      <td mat-cell *matCellDef="let thing">{{thing.name}}</td>
+    </ng-container>
+    <ng-container matColumnDef="created">
+      <th mat-header-cell *matHeaderCellDef>Created</th>
+      <td mat-cell *matCellDef="let thing">{{thing.created | date: 'yyyy-MM-dd HH:mm:ss'}}</td>
+    </ng-container>
+    <ng-container *ngFor="let attrdefn of getVisibleAttrDefns()" [matColumnDef]="attrdefn.name">
+      <th mat-header-cell *matHeaderCellDef>{{attrdefn.name | capitalize}}</th>
+      <td mat-cell *matCellDef="let thing">
+        <ngContainer *ngIf="attrdefn.editInList">
+          <input type="text" *ngIf="attrdefn.handler == 'string'" [value]="thing.attributes[attrdefn.name].value"
+            class="string" (change)="change(thing, attrdefn, $event.target.value)">
+          <input type="text" *ngIf="attrdefn.handler == 'url'" [value]="thing.attributes[attrdefn.name].value"
+            class="url" (change)="change(thing, attrdefn, $event.target.value)">
+          <input type="text" *ngIf="attrdefn.handler == 'float'" [value]="thing.attributes[attrdefn.name].value"
+            (change)="change(thing, attrdefn, $event.target.value)">
+          <input type="text" *ngIf="attrdefn.handler == 'integer'" [value]="thing.attributes[attrdefn.name].value"
+            (change)="change(thing, attrdefn, $event.target.value)">
+          <input type="checkbox" *ngIf="attrdefn.handler == 'boolean'" value="true"
+            [checked]="thing.attributes[attrdefn.name].value ? 'checked' : ''"
+            (change)="change(thing, attrdefn, $event.target.checked)">
+        </ngContainer>
+        <ngContainer *ngIf="attrdefn.showInList && !attrdefn.editInList">
+          <div *ngIf="attrdefn.handler == 'string' || attrdefn.handler == 'url' || attrdefn.handler == 'float' || attrdefn.handler == 'integer'">{{thing.attributes[attrdefn.name].value}}</div>
+          <div *ngIf="attrdefn.handler == 'long-string'"><ngx-md>{{thing.attributes[attrdefn.name].value}}</ngx-md></div>
+          <div *ngIf="attrdefn.handler == 'datetime'">{{thing.attributes[attrdefn.name].value | date: 'yyyy-MM-dd HH:mm'}}</div>
+          <div *ngIf="attrdefn.handler == 'boolean'">{{thing.attributes[attrdefn.name].value ? 'true' : 'false'}}</div>
+          <div *ngIf="attrdefn.handler == 'link'">
+            <span *ngFor="let thing of thing.attributes[attrdefn.name].linkedThings">
+              <button type="button" class="btn simple-btn" (click)="view(thing)">{{thing.presentation}}</button>
+            </span>
+          </div>
+        </ngContainer>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="buttons">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let thing" class="buttons">
+        <button class="btn btn-success" (click)="view(thing)"> View</button>
+        <button class="btn btn-success" (click)="delete(thing)"> Delete</button>
+        <button class="btn btn-success" (click)="edit(thing)"> Edit</button>
+      </td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;" cdkDrag [cdkDragData]="row"></tr>
+    <!--
     <thead>
     <tr>
       <th *ngIf="hasName" (click)="sortName()">Name</th>
@@ -49,6 +98,7 @@
       </td>
     </tr>
     </tbody>
+  -->
   </table>
   <div>
     <button *ngFor="let breadcrumb of getBreadcrumbs()" class="btn btn-success" type="button"

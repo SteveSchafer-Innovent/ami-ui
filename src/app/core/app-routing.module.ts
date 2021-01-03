@@ -14,6 +14,7 @@ import { EditAttrDefnComponent } from "../attrdefn/edit-attrdefn/edit-attrdefn.c
 import { ListThingComponent } from "../thing/list-thing/list-thing.component";
 import { EditThingComponent } from "../thing/edit-thing/edit-thing.component";
 import { ViewThingComponent } from "../thing/view-thing/view-thing.component";
+import { SearchComponent } from '../search/search.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -28,6 +29,7 @@ const routes: Routes = [
   { path: 'list-thing', component: ListThingComponent },
   { path: 'edit-thing', component: EditThingComponent },
   { path: 'view-thing', component: ViewThingComponent },
+  { path: 'search', component: SearchComponent },
   { path: '', component: ListTypeComponent }
 ];
 

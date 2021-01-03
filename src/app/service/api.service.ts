@@ -124,6 +124,31 @@ export class ApiService {
     );
   }
 
+  search(args: {typeId: string, attrDefnId: string, searchInWords: boolean, searchInValues: boolean, searchLinks: boolean, query: string}): Observable<ApiResponse> {
+    let requests: any[] = [];
+    let attrDefnId = args.attrDefnId == '' ? null : +args.attrDefnId;
+    if(args.searchInWords) {
+      let request: any = {op: "word", attrDefnId: attrDefnId, word: args.query};
+      if(args.searchLinks) {
+        request = {op: "link", attrDefnId: request.attrDefnId, thing: request};
+      }
+      requests.push(request);
+    }
+    if(args.searchInValues) {
+      let request: any = {op: "value", attrDefnId: attrDefnId, value: args.query};
+      if(args.searchLinks) {
+        request = {op: "link", attrDefnId: request.attrDefnId, thing: request};
+      }
+      requests.push(request);
+    }
+    return this.http.post<ApiResponse>(`${this.baseUrl}/search`, requests).pipe(
+      catchError(val => {
+        this.handleError(val);
+        return of(val);
+      })
+    );
+  }
+
   saveThing(thing: Thing): Observable<ApiResponse> {
     console.log('saveThing', thing);
     let url = `${this.baseUrl}/thing/`;
@@ -142,10 +167,26 @@ export class ApiService {
     );
   }
 
-  saveThingOrder(typeId: number, contextThingId: number, thingIds: number[]) {
+  saveThingOrder(typeId: number, contextThingId: number, thingIds: number[]): Observable<ApiResponse> {
     console.log('saveThingOrder', typeId, contextThingId, thingIds);
     let requestObj = {typeId: typeId, contextThingId: contextThingId, thingIds: thingIds};
     return this.http.put<ApiResponse>(`${this.baseUrl}/thing/order`, requestObj).pipe(
+      catchError(val => {
+        this.handleError(val);
+        return of(val);
+      })
+    );
+  }
+
+  getThingOrder(typeId: number, contextThingId: number): Observable<ApiResponse> {
+    let observable: Observable<ApiResponse> = null;
+    if(contextThingId) {
+      observable = this.http.get<ApiResponse>(`${this.baseUrl}/thing/order/${typeId}/${contextThingId}`);
+    }
+    else {
+      observable = this.http.get<ApiResponse>(`${this.baseUrl}/thing/order/${typeId}`);
+    }
+    return observable.pipe(
       catchError(val => {
         this.handleError(val);
         return of(val);
@@ -218,7 +259,8 @@ export class ApiService {
   }
 
   getAttrDefns(typeId: number): Observable<ApiResponse> {
-    return this.http.get<ApiResponse>(`${this.baseUrl}/attrdefns/${typeId}`).pipe(
+    let url = typeId ? `${this.baseUrl}/attrdefns/${typeId}` : `${this.baseUrl}/attrdefns`;
+    return this.http.get<ApiResponse>(url).pipe(
       catchError(val => {
         this.handleError(val);
         return of(val);

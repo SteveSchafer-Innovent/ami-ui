@@ -54,7 +54,7 @@ export class Breadcrumbs {
 
   public getBreadcrumbs(): Breadcrumb[] {
     let breadcrumbsString = window.localStorage.getItem('breadcrumbs');
-    console.log('breadcrumbsString', breadcrumbsString);
+    // console.log('breadcrumbsString', breadcrumbsString);
     if(breadcrumbsString) {
       this.breadcrumbs = [];
       let array = JSON.parse(breadcrumbsString);

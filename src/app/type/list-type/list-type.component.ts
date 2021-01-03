@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from "@angular/router";
-import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { MatTable } from '@angular/material/table';
 
 import { Type } from "../../model/type.model";
 import { ApiService } from "../../service/api.service";
@@ -13,7 +14,9 @@ import { Breadcrumbs } from "../../service/breadcrumbs.service";
   styleUrls: ['./list-type.component.css']
 })
 export class ListTypeComponent implements OnInit {
-  types: Type[];
+  types: Type[] = []; // init so table has some data
+  @ViewChild('table') table: MatTable<Type>;
+  displayedColumns: string[] = ['name', 'attributes', 'items', 'buttons'];
 
   constructor(
     private router: Router,
@@ -40,7 +43,17 @@ export class ListTypeComponent implements OnInit {
         alert(`Failed to load ListTypeComponent: ${data.message}`);
         return;
       }
-      this.types = data.result;
+      let types = data.result;
+      types.sort((a: Type, b: Type) => {
+        if(a.name < b.name) {
+          return -1;
+        }
+        if(a.name > b.name) {
+          return 1;
+        }
+        return 0;
+      })
+      this.types = types;
     });
   }
 

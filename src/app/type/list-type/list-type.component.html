@@ -1,7 +1,34 @@
 <div class="col-md-5 type-container">
   <h2 style="margin: auto"> Types</h2>
   <button class="btn btn-danger" style="width:100px" (click)="addType()"> Add Type</button>
-  <table class="table table-striped">
+  <table mat-table #table [dataSource]="types" class="table table-striped">
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef>Name</th>
+      <td mat-cell *matCellDef="let type">{{type.name}}</td>
+    </ng-container>
+    <ng-container matColumnDef="attributes">
+      <th mat-header-cell *matHeaderCellDef>Attributes</th>
+      <td mat-cell *matCellDef="let type">
+        <button class="btn btn-simple" (click)="attributes(type)">{{type.attrCount}}</button>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="items">
+      <th mat-header-cell *matHeaderCellDef>Items</th>
+      <td mat-cell *matCellDef="let type">
+        <button class="btn btn-simple" (click)="things(type)">{{type.thingCount}}</button>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="buttons">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let type" class="buttons">
+        <button class="btn btn-success" (click)="deleteType(type)" [disabled]="type.thingCount > 0 || type.attrCount > 0">
+          Delete</button>
+        <button class="btn btn-success" (click)="editType(type)"> Edit</button>
+      </td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    <!--
     <thead>
     <tr>
       <th>Name</th>
@@ -22,5 +49,6 @@
       </td>
     </tr>
     </tbody>
+  -->
   </table>
 </div>

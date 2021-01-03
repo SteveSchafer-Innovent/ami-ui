@@ -1,11 +1,19 @@
-.type-container {
+.search-container {
   display: flex;
   flex-direction: column;
   margin: auto;
 }
-.btn-simple {
+div.form-group label {
+	font-size: smaller;
+}
+div.attribute label {
+	margin-right: 10px;
+}
+div.attribute select {
+	margin-right: 20px;
+}
+button.simple-btn {
 	border: 1px solid #ccc;
-	width: .8in;
 }
 table tr td.buttons button:nth-child(n+2) {
 	margin-left: 6px;
