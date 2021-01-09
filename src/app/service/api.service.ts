@@ -26,8 +26,7 @@ export class ApiService {
   }
 
   private handleError(val: ApiResponse): void {
-    console.log('caught error, val:');
-    console.log(val);
+    console.log('caught error, val', val);
     if(val.status === 401) {
       console.log('removing token');
       window.localStorage.removeItem('token');
@@ -124,23 +123,12 @@ export class ApiService {
     );
   }
 
-  search(args: {typeId: string, attrDefnId: string, searchInWords: boolean, searchInValues: boolean, searchLinks: boolean, query: string}): Observable<ApiResponse> {
+  search(args: {typeId: string, attrDefnId: string, query: string}): Observable<ApiResponse> {
     let requests: any[] = [];
     let attrDefnId = args.attrDefnId == '' ? null : +args.attrDefnId;
-    if(args.searchInWords) {
-      let request: any = {op: "word", attrDefnId: attrDefnId, word: args.query};
-      if(args.searchLinks) {
-        request = {op: "link", attrDefnId: request.attrDefnId, thing: request};
-      }
-      requests.push(request);
-    }
-    if(args.searchInValues) {
-      let request: any = {op: "value", attrDefnId: attrDefnId, value: args.query};
-      if(args.searchLinks) {
-        request = {op: "link", attrDefnId: request.attrDefnId, thing: request};
-      }
-      requests.push(request);
-    }
+    let typeId = args.typeId == '' ? null : +args.typeId;
+    let request: any = {op: "any", typeId: typeId, attrDefnId: attrDefnId, query: args.query};
+    requests.push(request);
     return this.http.post<ApiResponse>(`${this.baseUrl}/search`, requests).pipe(
       catchError(val => {
         this.handleError(val);

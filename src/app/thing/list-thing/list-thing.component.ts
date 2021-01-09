@@ -88,19 +88,14 @@ export class ListThingComponent implements OnInit {
         return;
       }
       this.attrdefns = data.result;
-      let hasName = false;
       this.nameAttrDefn = null;
       for(let attrdefn of this.attrdefns) {
         attrdefn.sorted = false;
         attrdefn.ascending = false;
         if(attrdefn.name == 'name') {
-          hasName = true;
           this.nameAttrDefn = attrdefn;
           break;
         }
-      }
-      if(hasName) {
-        this.displayedColumns.push('name');
       }
       this.displayedColumns.push('created');
       for(let attrdefn of this.attrdefns || []) {

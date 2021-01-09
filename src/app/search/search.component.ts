@@ -32,6 +32,7 @@ export class SearchComponent implements OnInit {
   types: Type[];
   attributes: MyAttrDefn[];
   results: ResultType[];
+  searching: boolean = false;
   @ViewChild('table') table: MatTable<FindThingResult>;
 
   constructor(
@@ -49,9 +50,6 @@ export class SearchComponent implements OnInit {
     this.form = this.formBuilder.group({
       typeId: [''],
       attrDefnId: [''],
-      searchInWords: [true],
-      searchInValues: [false],
-      searchLinks: [false],
       query: ['']
     });
     this.apiService.getTypes().subscribe( data => {
@@ -108,6 +106,7 @@ export class SearchComponent implements OnInit {
   }
 
   search(): void {
+    this.searching = true;
     let formValue = this.form.value;
     console.log('formValue', formValue);
     this.apiService.search(formValue).subscribe( data => {
@@ -150,7 +149,36 @@ export class SearchComponent implements OnInit {
 
           resultTypes[thing.type.id] = resultType;
         }
+        let component = this;
+        let setPresentation = function(attribute) {
+          let values = attribute.value;
+          attribute.linkedThings = [];
+          for(let i = 0; i < values.length; i++) {
+            let thingId = values[i];
+            component.apiService.getThing(thingId).subscribe( data => {
+              console.log('get linked thing data', data);
+              if(data.status != 200) {
+                alert("Failed to get linked thing: " + data.message);
+                return;
+              }
+              let linkedThing = data.result;
+              attribute.linkedThings[i] = linkedThing;
+              if(linkedThing.attributes.name && linkedThing.attributes.name.value) {
+                linkedThing.presentation = linkedThing.attributes.name.value;
+              }
+              else {
+                linkedThing.presentation = `${linkedThing.type.name} ${thingId}`;
+              }
+            });
+          }
+        };
         resultType.things.push(thing);
+        for(let attrdefn of resultType.attrdefns) {
+          if(attrdefn.handler == 'link' && attrdefn.showInList) {
+            let attribute = thing.attributes[attrdefn.name];
+            setPresentation(attribute);
+          }
+        }
       }
       console.log('resultTypes', resultTypes, this.form.value.typeId);
       this.results = [];
@@ -176,6 +204,7 @@ export class SearchComponent implements OnInit {
         return 0;
       });
       console.log('results', this.results);
+      this.searching = false;
     });
   }
 

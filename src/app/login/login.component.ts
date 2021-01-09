@@ -38,7 +38,7 @@ export class LoginComponent implements OnInit {
       }
       window.localStorage.setItem('token', data.result.token);
       window.localStorage.setItem('context', data.result.context);
-      this.router.navigate(['list-type']);
+      this.router.navigate(['']);
     });
   }
 }

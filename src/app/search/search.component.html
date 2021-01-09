@@ -2,7 +2,7 @@
   <h2 style="margin: auto"> Search</h2>
   <form [formGroup]="form">
 
-    <div class="form-group">
+    <div class="form-group type">
       <label for="name">Type:</label>
       <select formControlName="typeId" name="typeId" id="typeId" class="form-control" (change)="changeType()">
         <option value="">Any</option>
@@ -12,12 +12,10 @@
 
     <div class="form-group attribute">
       <label for="attrDefnId">Attribute:</label>
-      <select formControlName="attrDefnId" name="attrDefnId" id="attrDefnId" class="form-control" (change)="changeAttribute()" style="width: 2in; display: inline;">
+      <select formControlName="attrDefnId" name="attrDefnId" id="attrDefnId" class="form-control" (change)="changeAttribute()">
         <option value="">Any</option>
         <option [value]="attrdefn.id" *ngFor="let attrdefn of attributes">{{getAttrDefnName(attrdefn)}}</option>
       </select>
-      <label><input type="checkbox" name="words" formControlName="searchInWords" (change)="search()"/> Words</label>
-      <label><input type="checkbox" name="values" formControlName="searchInValues" (change)="search()"/> Values</label>
     </div>
 
     <div class="form-group">
@@ -27,64 +25,59 @@
 
   </form>
 
-  <!--
-  <table>
-    <tr *ngFor="let result of results">
-      <td style="padding-right: 20px">{{result.type.name}}</td>
-      <td>{{result.attributes.name ? result.attributes.name.value : ''}}</td>
-    </tr>
-  </table>
-  -->
+  <div class="searching" *ngIf="searching">Searching...</div>
 
   <div *ngFor="let type of results" class="type">
   <h3>{{type.name | pluralize | capitalize}}</h3>
-  <table mat-table #table [dataSource]="type.things" class="table table-striped">
-    <ng-container matColumnDef="name">
-      <th mat-header-cell *matHeaderCellDef>Name</th>
-      <td mat-cell *matCellDef="let thing">{{thing.attributes.name.value}}</td>
-    </ng-container>
-    <ng-container matColumnDef="created">
-      <th mat-header-cell *matHeaderCellDef>Created</th>
-      <td mat-cell *matCellDef="let thing">{{thing.created | date: 'yyyy-MM-dd HH:mm:ss'}}</td>
-    </ng-container>
-    <ng-container *ngFor="let attrdefn of getVisibleAttrDefns(type)" [matColumnDef]="attrdefn.name">
-      <th mat-header-cell *matHeaderCellDef>{{attrdefn.name | capitalize}}</th>
-      <td mat-cell *matCellDef="let thing">
-        <ngContainer *ngIf="attrdefn.editInList">
-          <input type="text" *ngIf="attrdefn.handler == 'string'" [value]="thing.attributes[attrdefn.name].value"
-            class="string" (change)="change(thing, attrdefn, $event.target.value)">
-          <input type="text" *ngIf="attrdefn.handler == 'url'" [value]="thing.attributes[attrdefn.name].value"
-            class="url" (change)="change(thing, attrdefn, $event.target.value)">
-          <input type="text" *ngIf="attrdefn.handler == 'float'" [value]="thing.attributes[attrdefn.name].value"
-            (change)="change(thing, attrdefn, $event.target.value)">
-          <input type="text" *ngIf="attrdefn.handler == 'integer'" [value]="thing.attributes[attrdefn.name].value"
-            (change)="change(thing, attrdefn, $event.target.value)">
-          <input type="checkbox" *ngIf="attrdefn.handler == 'boolean'" value="true"
-            [checked]="thing.attributes[attrdefn.name].value ? 'checked' : ''"
-            (change)="change(thing, attrdefn, $event.target.checked)">
-        </ngContainer>
-        <ngContainer *ngIf="attrdefn.showInList && !attrdefn.editInList">
-          <div *ngIf="attrdefn.handler == 'string' || attrdefn.handler == 'url' || attrdefn.handler == 'float' || attrdefn.handler == 'integer'">
-            {{thing.attributes[attrdefn.name].value}}</div>
-          <div *ngIf="attrdefn.handler == 'long-string'"><ngx-md>{{thing.attributes[attrdefn.name].value}}</ngx-md></div>
-          <div *ngIf="attrdefn.handler == 'datetime'">{{thing.attributes[attrdefn.name].value | date: 'yyyy-MM-dd HH:mm'}}</div>
-          <div *ngIf="attrdefn.handler == 'boolean'">{{thing.attributes[attrdefn.name].value ? 'true' : 'false'}}</div>
-          <div *ngIf="attrdefn.handler == 'link'">
-            <span *ngFor="let thing of thing.attributes[attrdefn.name].linkedThings">
-              <button type="button" class="btn simple-btn" (click)="view(thing)">{{thing.presentation}}</button>
-            </span>
-          </div>
-        </ngContainer>
-      </td>
-    </ng-container>
-    <ng-container matColumnDef="buttons">
-      <th mat-header-cell *matHeaderCellDef></th>
-      <td mat-cell *matCellDef="let thing" class="buttons">
-        <button class="btn btn-success" (click)="view(thing)"> View</button>
-      </td>
-    </ng-container>
-    <tr mat-header-row *matHeaderRowDef="type.displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: type.displayedColumns;"></tr>
-  </table>
+
+    <table mat-table #table [dataSource]="type.things" class="table table-striped">
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Name</th>
+        <td mat-cell *matCellDef="let thing">{{thing.attributes.name.value}}</td>
+      </ng-container>
+      <ng-container matColumnDef="created">
+        <th mat-header-cell *matHeaderCellDef>Created</th>
+        <td mat-cell *matCellDef="let thing">{{thing.created | date: 'yyyy-MM-dd HH:mm:ss'}}</td>
+      </ng-container>
+      <ng-container *ngFor="let attrdefn of getVisibleAttrDefns(type)" [matColumnDef]="attrdefn.name">
+        <th mat-header-cell *matHeaderCellDef>{{attrdefn.name | capitalize}}</th>
+        <td mat-cell *matCellDef="let thing">
+          <ngContainer *ngIf="attrdefn.editInList">
+            <input type="text" *ngIf="attrdefn.handler == 'string'" [value]="thing.attributes[attrdefn.name].value"
+              class="string" (change)="change(thing, attrdefn, $event.target.value)">
+            <input type="text" *ngIf="attrdefn.handler == 'url'" [value]="thing.attributes[attrdefn.name].value"
+              class="url" (change)="change(thing, attrdefn, $event.target.value)">
+            <input type="text" *ngIf="attrdefn.handler == 'float'" [value]="thing.attributes[attrdefn.name].value"
+              (change)="change(thing, attrdefn, $event.target.value)">
+            <input type="text" *ngIf="attrdefn.handler == 'integer'" [value]="thing.attributes[attrdefn.name].value"
+              (change)="change(thing, attrdefn, $event.target.value)">
+            <input type="checkbox" *ngIf="attrdefn.handler == 'boolean'" value="true"
+              [checked]="thing.attributes[attrdefn.name].value ? 'checked' : ''"
+              (change)="change(thing, attrdefn, $event.target.checked)">
+          </ngContainer>
+          <ngContainer *ngIf="attrdefn.showInList && !attrdefn.editInList">
+            <div *ngIf="attrdefn.handler == 'string' || attrdefn.handler == 'url' || attrdefn.handler == 'float' || attrdefn.handler == 'integer'">
+              {{thing.attributes[attrdefn.name].value}}</div>
+            <div *ngIf="attrdefn.handler == 'long-string'"><ngx-md>{{thing.attributes[attrdefn.name].value}}</ngx-md></div>
+            <div *ngIf="attrdefn.handler == 'datetime'">{{thing.attributes[attrdefn.name].value | date: 'yyyy-MM-dd HH:mm'}}</div>
+            <div *ngIf="attrdefn.handler == 'boolean'">{{thing.attributes[attrdefn.name].value ? 'true' : 'false'}}</div>
+            <div *ngIf="attrdefn.handler == 'link'">
+              <span *ngFor="let thing of thing.attributes[attrdefn.name].linkedThings">
+                <button type="button" class="btn simple-btn" (click)="view(thing)">{{thing.presentation}}</button>
+              </span>
+            </div>
+          </ngContainer>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="buttons">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let thing" class="buttons">
+          <button class="btn btn-success" (click)="view(thing)"> View</button>
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="type.displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: type.displayedColumns;"></tr>
+    </table>
+
   </div>
 </div>

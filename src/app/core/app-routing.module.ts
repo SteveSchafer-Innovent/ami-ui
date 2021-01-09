@@ -30,7 +30,7 @@ const routes: Routes = [
   { path: 'edit-thing', component: EditThingComponent },
   { path: 'view-thing', component: ViewThingComponent },
   { path: 'search', component: SearchComponent },
-  { path: '', component: ListTypeComponent }
+  { path: '', component: SearchComponent }
 ];
 
 @NgModule({

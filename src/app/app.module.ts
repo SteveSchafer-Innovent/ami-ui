@@ -12,7 +12,6 @@ import { AppRoutingModule } from './core/app-routing.module';
 import { CustomMaterialModule } from "./core/material.module";
 import { AppComponent } from './app.component';
 import { ApiService } from "./service/api.service";
-import { FileUploadService } from './service/file-upload.service';
 import { ListThingContextService } from './service/list-thing-context.service';
 import { Breadcrumbs } from './service/breadcrumbs.service';
 import { TokenInterceptor } from "./core/interceptor";
@@ -68,7 +67,6 @@ import { SearchComponent } from './search/search.component';
   ],
   providers: [
     ApiService,
-    FileUploadService,
     ListThingContextService,
     Breadcrumbs,
     {

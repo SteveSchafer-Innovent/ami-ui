@@ -6,11 +6,14 @@
 div.form-group label {
 	font-size: smaller;
 }
-div.attribute label {
-	margin-right: 10px;
+div.type {
+	width: 2in;
+	float: left;
+	padding-right: 20px;
 }
-div.attribute select {
-	margin-right: 20px;
+div.attribute {
+	width: 3in;
+	margin-left: 2in;
 }
 button.simple-btn {
 	border: 1px solid #ccc;
@@ -25,6 +28,15 @@ table tr td.buttons {
 table tr th {
 	vertical-align: middle;
 }
+table tr th:nth-child(n+2) {
+	padding-left: 10px;
+}
 table tr td {
 	vertical-align: middle;
+}
+table tr td:nth-child(n+2) {
+	padding-left: 10px;
+}
+div.searching {
+	color: #666;
 }

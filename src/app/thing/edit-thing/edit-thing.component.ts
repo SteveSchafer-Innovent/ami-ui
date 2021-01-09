@@ -8,7 +8,6 @@ import { Type } from "../../model/type.model";
 import { AttrDefn } from "../../model/attrdefn.model";
 import { ApiService } from "../../service/api.service";
 import { ListThingContextService, ListThingContext } from "../../service/list-thing-context.service";
-import { FileUploadService } from "../../service/file-upload.service";
 import { Breadcrumbs, Breadcrumb } from "../../service/breadcrumbs.service";
 import { FindThingResult } from "../../model/find-thing-result.model";
 
@@ -60,8 +59,7 @@ export class EditThingComponent implements OnInit {
     private route: ActivatedRoute,
     private apiService: ApiService,
     private listThingContextService: ListThingContextService,
-    private breadcrumbs: Breadcrumbs,
-    private fileUploadSevice: FileUploadService
+    private breadcrumbs: Breadcrumbs
   ) {
     console.log('Editor', this.Editor);
   }
