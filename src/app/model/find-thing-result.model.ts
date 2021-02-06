@@ -1,94 +1,147 @@
-import { Type } from "./type.model";
-import { User } from "./user.model";
-import { Attribute } from "./attribute.model";
-import { ApiService } from "../service/api.service";
+import { of, from } from 'rxjs';
+import { Observable } from 'rxjs/index';
+import { switchMap, mergeMap, takeLast } from 'rxjs/operators';
+
+import { Type } from './type.model';
+import { User } from './user.model';
+import { Thing } from './thing.model';
+import { Attribute } from './attribute.model';
+import { AttrDefn } from './attrdefn.model';
+import { ApiService } from '../service/api.service';
+import { ApiResponse } from '../model/api.response';
+
+export class MyType extends Type {
+  attrdefns: AttrDefn[];
+}
+
+let myTypeCache = {};
+// console.log('instantiating myTypeCache');
+
+export function getType(apiService: ApiService, typeId: number): Observable<MyType> {
+  let myType: MyType = myTypeCache[typeId];
+  if(myType) {
+    return of(myType);
+  }
+  else {
+    return apiService.getType(typeId).pipe(switchMap( data => {
+      if(data.status != 200) {
+        alert(`Failed to get type ${typeId}: ${data.message}`);
+        return;
+      }
+      myType = data.result;
+      return apiService.getAttrDefns(typeId);
+    })).pipe(switchMap( data => {
+      // console.log(`getAttrDefns ${typeId}, data`, data);
+      if(data.status != 200) {
+        alert(`Failed to get attr defns for type ${typeId}: ${data.message}`);
+        return;
+      }
+      myType.attrdefns = data.result;
+      myTypeCache[typeId] = myType;
+      return of(myType);
+    }));
+  }
+}
+
+let myThingCache = {};
+
+export function getThing(apiService: ApiService, thing: Thing): Observable<FindThingResult> {
+  if(myThingCache[thing.id]) {
+    return of(myThingCache[thing.id]);
+  }
+  let resultThing = new FindThingResult(apiService, thing);
+  myThingCache[thing.id] = resultThing;
+  return resultThing.init();
+}
 
 export class FindThingResult {
   id: number;
-  type: Type;
+  typeId: number;
+  type: MyType;
   created: Date;
+  creatorId: number;
   creator: User;
-  attributes: any;
-  links: any;
   name: string;
+  attributes: any[] = [];
   image: any;
   parent: FindThingResult;
   presentation: string;
 
-  constructor(private apiService: ApiService, thing) {
+  constructor(private apiService: ApiService, thing: Thing) {
+    // console.log('constructing thing', thing);
     this.id = thing.id;
-    this.type = thing.type;
+    this.typeId = thing.typeId;
     this.created = thing.created;
-    this.creator = thing.creator;
-    this.attributes = thing.attributes;
-    this.links = thing.links;
-    this.name = thing.name;
-    this.image = thing.image;
-    this.parent = thing.parent;
-    this.presentation = this.getThingName(thing);
-    let model = this;
-    this.setParent(this, {}, function() {
-      model.name = model.getThingName(thing);
-      model.setThingImage(thing, thing);
-    });
+    this.creatorId = thing.creator;
   }
 
-  private setParent(thing: FindThingResult, recursion: {}, callback) {
-    if(recursion[thing.id]) {
-      console.error(`parent recursion detected for thing ${thing.id}`);
-      callback();
-      return;
-    }
-    recursion[thing.id] = true;
-    if(thing.attributes.parent && thing.attributes.parent.value) {
-      let parents = thing.attributes.parent.value;
-      console.log('parents', parents);
-      if(parents.length > 0) {
-        let parentId = parents[0];
-        this.apiService.getThing(parentId).subscribe( data => {
-          console.log('getThing data', data);
-          if(data.status != 200) {
-            console.log(`Failed to get parent thing ${parentId}`);
-            return;
-          }
-          thing.parent = data.result;
-          this.setParent(thing.parent, recursion, callback);
-        });
+  public init(): Observable<FindThingResult> {
+    // console.log(`init FindThingResult, thingId = ${this.id}, typeId = ${this.typeId}`);
+    return this.apiService.getUserById(this.creatorId).pipe(mergeMap( data => {
+      if(data.status != 200) {
+        alert(`Failed getUserById ${this.creatorId}: ${data.message}`);
+        return;
       }
-      else {
-        callback();
+      this.creator = data.result;
+      return getType(this.apiService, this.typeId);
+    })).pipe(mergeMap( myType => {
+      this.type = myType;
+      return from(myType.attrdefns);
+    })).pipe(mergeMap( attrdefn => {
+      // console.log('FindThingResult.init: attrdefn', attrdefn);
+      return this.apiService.getThingAttribute(this.id, attrdefn.id);
+    })).pipe(switchMap( data => {
+      // console.log(`FindThingResult.init: getThingAttribute ${this.id}, data`, data);
+      if(data.status != 200) {
+        alert(`Failed getThingAttribute ${this.id}: ${data.message}`);
+        return;
       }
-    }
-    else {
-      callback();
-    }
-  }
-
-  private getThingName(thing): string {
-    let name: string;
-    if(thing.attributes.name && thing.attributes.name.value) {
-      name = thing.attributes.name.value;
-    }
-    else {
-      name = `${this.type.name} ${this.id}`;
-    }
-    if(thing.parent) {
-      return name + ' ' + this.getThingName(thing.parent);
-    }
-    return name;
+      this.attributes[data.result.name] = data.result;
+      return of(this);
+    }), takeLast(1)).pipe(switchMap( thing => {
+      return this.apiService.getThingName(thing.id);
+    })).pipe(switchMap(data => {
+      // console.log(`FindThingResult.init: getThingName ${this.id}, data`, data);
+      if(data.status != 200) {
+        alert(`Failed to get name for thing ${this.id}: ${data.message}`);
+        return;
+      }
+      this.name = data.result;
+      return this.apiService.getThingPresentation(this.id);
+    })).pipe(switchMap(data => {
+      // console.log(`FindThingResult.init: getThingPresentation ${this.id}, data`, data);
+      if(data.status != 200) {
+        alert(`Failed to get presentation for thing ${this.id}: ${data.message}`);
+        return;
+      }
+      // console.log(`thing ${this.id} presentation = ${data.result}`);
+      this.presentation = data.result;
+      return this.apiService.getThingParent(this.id).pipe(switchMap(data => {
+        // console.log(`getThingParent ${this.id}, data`, data);
+        if(data.status != 200) {
+          alert(`Failed to get parent of thing ${this.id}: ${data.message}`);
+          return;
+        }
+        let thing = this;
+        if(data.result != null) {
+          return getThing(this.apiService, data.result).pipe(mergeMap( parentThing => {
+            return of(thing);
+          }));
+        }
+        return of(thing);
+      }));
+    }));
   }
 
   private setThingImage(targetThing, thing) {
     if(thing.attributes.image && thing.attributes.image.value) {
       let observable = this.apiService.downloadFile(thing.id, thing.attributes.image.id);
       observable.subscribe((file) => {
-        console.log('file', file);
+        // console.log('file', file);
         // method 1 - more compact URL
         // need to revokeObjectURL after image is loaded
         // const url = URL.createObjectURL(file.body); // does not work on file
-        // console.log('url', url);
         // let image = this.sanitizer.bypassSecurityTrustUrl(url);
-        // console.log(image);
         // thing.image = image;
         // method 2 - data URL
         const reader = new FileReader();
@@ -96,11 +149,8 @@ export class FindThingResult {
           let dataUrl = reader.result;
           targetThing.image = dataUrl;
           // let s = String.fromCharCode.apply(null, arrayBuffer);
-          // console.log('string', s);
           // let base64String = btoa(s);
-          // console.log('base64String', base64String);
           // thing.image = 'data:image/jpeg;base64,' + base64String;
-          // console.log(thing.image);
         });
         reader.readAsDataURL(file.body);
       });

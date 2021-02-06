@@ -15,6 +15,26 @@ div.attribute {
 	width: 3in;
 	margin-left: 2in;
 }
+div.sorts {
+	width: 2in;
+	float: left;
+	padding-right: 20px;
+}
+div.page-size {
+	width: 2in;
+	float: left;
+	padding-right: 20px;
+}
+div.page {
+	width: 2in;
+	margin-left: 4in;
+}
+div.page input {
+	display: inline;
+	width: 0.8in;
+	margin-left: 6px;
+	margin-right: 6px;
+}
 button.simple-btn {
 	border: 1px solid #ccc;
 }

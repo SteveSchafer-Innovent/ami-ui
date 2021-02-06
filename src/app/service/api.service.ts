@@ -18,7 +18,7 @@ export class ApiService {
   baseUrl: string = `http://${environment.host}:${environment.port}`;
 
   constructor(private http: HttpClient) {
-    console.log('constructing ApiService', http);
+    // console.log('constructing ApiService', http);
   }
 
   login(loginPayload) : Observable<ApiResponse> {
@@ -26,9 +26,9 @@ export class ApiService {
   }
 
   private handleError(val: ApiResponse): void {
-    console.log('caught error, val', val);
+    // console.log('caught error, val', val);
     if(val.status === 401) {
-      console.log('removing token');
+      // console.log('removing token');
       window.localStorage.removeItem('token');
     }
   }
@@ -114,6 +114,63 @@ export class ApiService {
     );
   }
 
+  getThingName(thingId: number): Observable<ApiResponse> {
+    return this.http.get<ApiResponse>(`${this.baseUrl}/thing/name/${thingId}`).pipe(
+      catchError(val => {
+        this.handleError(val);
+        return of(val);
+      })
+    );
+  }
+
+  getThingPresentation(thingId: number): Observable<ApiResponse> {
+    return this.http.get<ApiResponse>(`${this.baseUrl}/thing/presentation/${thingId}`).pipe(
+      catchError(val => {
+        this.handleError(val);
+        return of(val);
+      })
+    );
+  }
+
+  getThingParent(thingId: number): Observable<ApiResponse> {
+    return this.http.get<ApiResponse>(`${this.baseUrl}/thing/parent/${thingId}`).pipe(
+      catchError(val => {
+        this.handleError(val);
+        return of(val);
+      })
+    );
+  }
+
+  getThingAttribute(thingId: number, attrDefnId: number) {
+    // console.log(`getThingAttribute ${thingId}, ${attrDefnId}`);
+    return this.http.get<ApiResponse>(`${this.baseUrl}/thing/attribute/${thingId}/${attrDefnId}`).pipe(
+      catchError(val => {
+        this.handleError(val);
+        return of(val);
+      })
+    );
+  }
+
+  getThingAttributes(thingId: number) {
+    // console.log(`getAttributes ${thingId}`);
+    return this.http.get<ApiResponse>(`${this.baseUrl}/thing/attributes/${thingId}`).pipe(
+      catchError(val => {
+        this.handleError(val);
+        return of(val);
+      })
+    );
+  }
+
+  getThingSourceLinks(thingId: number) {
+    // console.log(`getSourceLinks ${thingId}`);
+    return this.http.get<ApiResponse>(`${this.baseUrl}/thing/source-links/${thingId}`).pipe(
+      catchError(val => {
+        this.handleError(val);
+        return of(val);
+      })
+    );
+  }
+
   getThings(typeId: number): Observable<ApiResponse> {
     return this.http.get<ApiResponse>(`${this.baseUrl}/things/${typeId}`).pipe(
       catchError(val => {
@@ -137,8 +194,34 @@ export class ApiService {
     );
   }
 
+  getSearchResults(searchId: string, sortNames: string[], pageSize: number, page: number): Observable<ApiResponse> {
+    let url = `${this.baseUrl}/search-results/${searchId}`;
+    let params = [];
+    if(sortNames != null && sortNames.length > 1) {
+      sortNames.length = sortNames.length - 1;
+      let sorts = sortNames.join(',');
+      params.push(`sorts=${sorts}`);
+    }
+    if(pageSize != null) {
+      params.push(`page-size=${pageSize}`);
+    }
+    if(page != null) {
+      params.push(`page=${page}`);
+    }
+    if(params.length > 0) {
+      url += '?' + params.join('&');
+    }
+    console.log(`getSearchResults ${url}`);
+    return this.http.get<ApiResponse>(url).pipe(
+      catchError(val => {
+        this.handleError(val);
+        return of(val);
+      })
+    );
+  }
+
   saveThing(thing: Thing): Observable<ApiResponse> {
-    console.log('saveThing', thing);
+    // console.log('saveThing', thing);
     let url = `${this.baseUrl}/thing/`;
     let observable: Observable<ApiResponse> = null;
     if(thing.id == null) {
@@ -156,7 +239,7 @@ export class ApiService {
   }
 
   saveThingOrder(typeId: number, contextThingId: number, thingIds: number[]): Observable<ApiResponse> {
-    console.log('saveThingOrder', typeId, contextThingId, thingIds);
+    // console.log('saveThingOrder', typeId, contextThingId, thingIds);
     let requestObj = {typeId: typeId, contextThingId: contextThingId, thingIds: thingIds};
     return this.http.put<ApiResponse>(`${this.baseUrl}/thing/order`, requestObj).pipe(
       catchError(val => {
@@ -201,7 +284,16 @@ export class ApiService {
   }
 
   getTypes() : Observable<ApiResponse> {
-    return this.http.get<ApiResponse>(`${this.baseUrl}/types/`).pipe(
+    return this.http.get<ApiResponse>(`${this.baseUrl}/types`).pipe(
+      catchError(val => {
+        this.handleError(val);
+        return of(val);
+      })
+    );
+  }
+
+  getTypesWithCounts() : Observable<ApiResponse> {
+    return this.http.get<ApiResponse>(`${this.baseUrl}/types-with-counts`).pipe(
       catchError(val => {
         this.handleError(val);
         return of(val);
@@ -336,30 +428,20 @@ export class ApiService {
     );
   }
 
-  getAttribute(thingId: number, attrDefnId: number) {
-    console.log(`getAttribute ${thingId}, ${attrDefnId}`);
-    return this.http.get<ApiResponse>(`${this.baseUrl}/attribute/${thingId}/${attrDefnId}`).pipe(
-      catchError(val => {
-        this.handleError(val);
-        return of(val);
-      })
-    );
-  }
-
   downloadFile(thingId: number, attrdefnId: number) {
     let url = `${this.baseUrl}/download/${thingId}/${attrdefnId}`;
     return this.http.get(url, {responseType: 'blob', observe: 'response'});
   }
 
   postFile(fileToUpload: File, thingId: number, attrId: number): Observable<ApiResponse> {
-      console.log("postFile", fileToUpload, thingId, attrId);
+      // console.log("postFile", fileToUpload, thingId, attrId);
       const formData: FormData = new FormData();
       formData.set('file', fileToUpload, fileToUpload.name);
       formData.set('thingId', "" + thingId);
       formData.set('attrId', "" + attrId);
       return this.http.post<ApiResponse>(`${this.baseUrl}/upload`, formData).pipe(
       catchError(val => {
-        console.log('val:', val);
+        // console.log('val:', val);
         return of(val);
       })
     );

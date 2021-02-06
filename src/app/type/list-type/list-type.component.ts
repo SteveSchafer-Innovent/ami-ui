@@ -32,12 +32,13 @@ export class ListTypeComponent implements OnInit {
     }
     this.breadcrumbs.clear();
     this.listThingContextService.setContext(null);
-    this.apiService.getTypes().subscribe( data => {
+    this.apiService.getTypesWithCounts().subscribe( data => {
       console.log('ListTypeComponent.ngOnInit.loadPage data', data);
       if(data.status === 401) {
         console.log('removing token');
         window.localStorage.removeItem('token');
         this.router.navigate(['list-type']);
+        return;
       }
       if(data.status != 200) {
         alert(`Failed to load ListTypeComponent: ${data.message}`);

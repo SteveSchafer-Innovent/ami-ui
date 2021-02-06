@@ -24,11 +24,11 @@
             (change)="change(thing, attrdefn, $event.target.checked)">
         </ngContainer>
         <ngContainer *ngIf="attrdefn.showInList && !attrdefn.editInList">
-          <div *ngIf="attrdefn.handler == 'string' || attrdefn.handler == 'url' || attrdefn.handler == 'float' || attrdefn.handler == 'integer'">{{thing.attributes[attrdefn.name].value}}</div>
+          <div *ngIf="attrdefn.handler == 'string' || attrdefn.handler == 'url' || attrdefn.handler == 'float' || attrdefn.handler == 'integer'">{{getAttrValue(thing, attrdefn)}}</div>
           <div *ngIf="attrdefn.handler == 'long-string'"><ngx-md>{{thing.attributes[attrdefn.name].value}}</ngx-md></div>
           <div *ngIf="attrdefn.handler == 'datetime'">{{thing.attributes[attrdefn.name].value | date: 'yyyy-MM-dd HH:mm'}}</div>
           <div *ngIf="attrdefn.handler == 'boolean'">{{thing.attributes[attrdefn.name].value ? 'true' : 'false'}}</div>
-          <div *ngIf="attrdefn.handler == 'link'">
+          <div *ngIf="attrdefn.handler == 'link' && thing.attributes[attrdefn.name]">
             <span *ngFor="let thing of thing.attributes[attrdefn.name].linkedThings">
               <button type="button" class="btn simple-btn" (click)="view(thing)">{{thing.presentation}}</button>
             </span>
@@ -42,6 +42,7 @@
         <button class="btn btn-success" (click)="view(thing)"> View</button>
         <button class="btn btn-success" (click)="delete(thing)"> Delete</button>
         <button class="btn btn-success" (click)="edit(thing)"> Edit</button>
+        <button class="btn btn-success" (click)="links(thing)"> Links</button>
       </td>
     </ng-container>
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

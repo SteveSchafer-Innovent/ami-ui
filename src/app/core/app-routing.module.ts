@@ -15,6 +15,7 @@ import { ListThingComponent } from "../thing/list-thing/list-thing.component";
 import { EditThingComponent } from "../thing/edit-thing/edit-thing.component";
 import { ViewThingComponent } from "../thing/view-thing/view-thing.component";
 import { SearchComponent } from '../search/search.component';
+import { TestComponent } from '../test/test.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -30,6 +31,7 @@ const routes: Routes = [
   { path: 'edit-thing', component: EditThingComponent },
   { path: 'view-thing', component: ViewThingComponent },
   { path: 'search', component: SearchComponent },
+  { path: 'test', component: TestComponent },
   { path: '', component: SearchComponent }
 ];
 

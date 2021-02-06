@@ -2,7 +2,7 @@
   <h2 class="text-center">{{getTitle()}}</h2>
   <form [formGroup]="form" (ngSubmit)="onSubmit()">
     <div class="form-group" *ngFor="let attrdefn of attrdefns; trackBy: trackAttrDefn">
-      <div class="name">
+      <div class="name" *ngIf="attrdefn.handler != 'link'">
         {{attrdefn.name}}
       </div>
       <div class="value">
@@ -54,12 +54,10 @@
         <ckeditor *ngIf="attrdefn.handler == 'rich-text'" [editor]="Editor"
           [(ngModel)]="attrdefn.richTextModel.editorData" [ngModelOptions]="{standalone: true}"
           [config]="editorConfig"></ckeditor>
-        <div [formArray]="attrdefn.formArray" *ngIf="attrdefn.handler == 'link'" class="links">
+        <div [formArray]="attrdefn.formArray" *ngIf="attrdefn.handler == 'link' && false" class="links">
           <div *ngFor="let formControl of attrdefn.formArray.controls">
-            <select [formControl]="formControl">
-              <option value="0">none</option>
-              <option [value]="thing.id" *ngFor="let thing of attrdefn.things">{{thing.presentation}}</option>
-            </select>
+            {{formControl.value}}
+            <input type="text" [formControl]="formControl" placeholder="thing id">
           </div>
         </div>
       </div>

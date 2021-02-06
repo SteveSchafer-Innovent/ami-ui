@@ -20,13 +20,47 @@
 
     <div class="form-group">
       <label for="query">Search for:</label>
-      <textarea formControlName="query" name="query" id="query" class="form-control" (keyup)="search()"></textarea>
+      <textarea formControlName="query" name="query" id="query" class="form-control" (input)="search(null)"></textarea>
+    </div>
+
+  </form>
+  <form [formGroup]="resultsForm" *ngIf="!searching && resultCount > 0">
+
+    <div formArrayName="selectedSortNames" class="form-group sorts"> 
+      <label>Sort:</label>
+      <div *ngFor="let formControl of selectedSortsFormArray.controls">
+        <select [formControl]="formControl" class="form-control" (change)="load(null)">
+          <option value="">None</option>
+          <option [value]="sortName" *ngFor="let sortName of availableSortNames">{{sortName}}</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group page-size">
+      <label for="page-size">Page size:</label>
+      <input type="text" formControlName="pageSize" name="page-size" id="page-size" class="form-control" (input)="load(null)">
+    </div>
+
+    <div class="form-group page">
+      <label for="page">Page (of {{getMaxPage()}}):</label>
+      <div>
+        <button class="btn btn-simple" (click)="advancePage(-1)" [disabled]="!canAdvancePage(-1)">&lt;</button>
+        <input type="text" formControlName="page" name="page" id="page" class="form-control" (input)="load(null)">
+        <button class="btn btn-simple" (click)="advancePage(1)" [disabled]="!canAdvancePage(1)">&gt;</button>
+      </div>
     </div>
 
   </form>
 
-  <div class="searching" *ngIf="searching">Searching...</div>
+  <div class="searching" *ngIf="searching && !loading">Searching...</div>
 
+  <div class="searching" *ngIf="loading">Fetching...</div>
+
+  <div class="searching" *ngIf="!searching && !loading">Showing 
+    {{getFirstThingNumber()}} - 
+    {{getLastThingNumber()}} of 
+    {{resultCount}}</div>
+    
   <div *ngFor="let type of results" class="type">
   <h3>{{type.name | pluralize | capitalize}}</h3>
 
@@ -61,7 +95,7 @@
             <div *ngIf="attrdefn.handler == 'long-string'"><ngx-md>{{thing.attributes[attrdefn.name].value}}</ngx-md></div>
             <div *ngIf="attrdefn.handler == 'datetime'">{{thing.attributes[attrdefn.name].value | date: 'yyyy-MM-dd HH:mm'}}</div>
             <div *ngIf="attrdefn.handler == 'boolean'">{{thing.attributes[attrdefn.name].value ? 'true' : 'false'}}</div>
-            <div *ngIf="attrdefn.handler == 'link'">
+            <div *ngIf="attrdefn.handler == 'link' && thing.attributes[attrdefn.name]">
               <span *ngFor="let thing of thing.attributes[attrdefn.name].linkedThings">
                 <button type="button" class="btn simple-btn" (click)="view(thing)">{{thing.presentation}}</button>
               </span>
@@ -81,3 +115,5 @@
 
   </div>
 </div>
+<ng-keyboard-shortcuts [shortcuts]="shortcuts"></ng-keyboard-shortcuts>
+<ng-keyboard-shortcuts-help [key]="'f1'" [closeKey]="'escape'" [title]="'Help'"></ng-keyboard-shortcuts-help>

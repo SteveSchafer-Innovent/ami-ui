@@ -31,6 +31,8 @@ import { DragDropDirective } from './dragdrop.directive';
 import { PluralizePipe } from './pluralize.pipe';
 import { CapitalizePipe } from './capitalize.pipe';
 import { SearchComponent } from './search/search.component';
+import { TestComponent } from './test/test.component';
+import { KeyboardShortcutsModule } from 'ng-keyboard-shortcuts';
 
 @NgModule({
   declarations: [
@@ -50,7 +52,8 @@ import { SearchComponent } from './search/search.component';
     DragDropDirective,
     PluralizePipe,
     CapitalizePipe,
-    SearchComponent
+    SearchComponent,
+    TestComponent
   ],
   imports: [
     BrowserModule,
@@ -63,7 +66,8 @@ import { SearchComponent } from './search/search.component';
     AppRoutingModule,
     OwlDateTimeModule,
     OwlNativeDateTimeModule,
-    NgxMdModule.forRoot()
+    NgxMdModule.forRoot(),
+    KeyboardShortcutsModule.forRoot()
   ],
   providers: [
     ApiService,

@@ -25,6 +25,7 @@
     "@ckeditor/ckeditor5-build-classic": "^23.0.0",
     "@types/lodash": "^4.14.164",
     "lodash": "^4.17.20",
+    "ng-keyboard-shortcuts": "^10.1.17",
     "ng-pick-datetime": "^7.0.0",
     "ngx-md": "^8.1.6",
     "object-path": "^0.11.5",
