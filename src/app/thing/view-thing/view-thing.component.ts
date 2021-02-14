@@ -19,6 +19,7 @@ class FindTypeResult {
   attrdefns: AttrDefn[];
   visibleAttrdefns: AttrDefn[];
 }
+
 class AttrDefnFormControl extends AttrDefn {
   targetTypeId: number;
   targetType: FindTypeResult;
@@ -26,6 +27,7 @@ class AttrDefnFormControl extends AttrDefn {
   value: any;
   expanded: boolean;
 }
+
 class LinkAttrDefn extends AttrDefn {
   typeName: string;
   targetedThings: FindThingResult[];
@@ -238,7 +240,7 @@ export class ViewThingComponent implements OnInit {
               this.attrdefns = data.result;
               let richText = null;
               for(let attrdefn of this.attrdefns) {
-                // console.log('attrdefn', attrdefn);
+                console.log('attrdefn', attrdefn);
                 attrdefn.image = null;
                 let attribute = this.thing.attributes[attrdefn.name];
                 if(attribute) {
@@ -465,11 +467,11 @@ export class ViewThingComponent implements OnInit {
 
   gotoThings(): void {
     this.breadcrumbs.clear();
-    this.router.navigate(['list-thing', { 'typeId': this.type.id }]);
+    this.router.navigate(['search', { 'typeId': this.type.id, 'query': '*' }]);
   }
 
   gotoEditor(): void {
-    this.breadcrumbs.push(new Breadcrumb('list-thing', {typeId: this.type.id}, this.context, this.getTitle()));
+    this.breadcrumbs.push(new Breadcrumb('edit-thing', {typeId: this.type.id}, this.context, this.getTitle()));
     this.listThingContextService.setContext(this.context);
     this.router.navigate(['edit-thing', { 'thingId': this.thing.id }]);
   }
@@ -510,28 +512,14 @@ export class ViewThingComponent implements OnInit {
     this.router.navigate(['view-thing', { 'thingId': thing.id }]);
   }
 
-  delete(thing: Thing, attrdefn): void {
-    this.unlink(thing, attrdefn);
-    this.apiService.deleteAttributesByThingId(thing.id).subscribe( data => {
-      // console.log("deleteAttributesByThingId data", data);
+  delete(): void {
+    this.apiService.deleteThing(this.thing.id).subscribe( data => {
+      // console.log("deleteThing data", data);
       if(data.status != 200) {
-        alert("Failed to delete attributes for thing: " + data.message);
+        alert("Failed to delete thing: " + data.message);
         return;
       }
-      this.apiService.deleteThing(thing.id).subscribe( data => {
-        // console.log("deleteThing data", data);
-        if(data.status != 200) {
-          alert("Failed to delete thing: " + data.message);
-          return;
-        }
-        let attribute = this.thing.attributes[attrdefn.name];
-        let thingIds = attribute.value;
-        let index = thingIds.indexOf(thing.id);
-        if(index >= 0) {
-          thingIds.splice(index, 1);
-        }
-        this.fetchLinkedThings(attrdefn, attribute);
-      });
+      this.gotoThings();
     });
   }
 
@@ -601,10 +589,15 @@ export class ViewThingComponent implements OnInit {
     this.breadcrumbs.push(new Breadcrumb('view-thing', {thingId: this.thing.id}, this.context, this.getTitle()));
     let context: ListThingContext = {linkAttrDefn: linktomeAttrDefn, linkedThing: this.thing};
     this.listThingContextService.setContext(context);
-    this.router.navigate(['list-thing', {typeId: linktomeAttrDefn.typeId}]);
+    this.router.navigate(['search', { 'typeId': linktomeAttrDefn.typeId, 'query': '*' }]);
   }
 
   expandFile(attrdefn: AttrDefnFormControl): void {
     attrdefn.expanded = !attrdefn.expanded;
+  }
+
+  addLinkTarget(attrdefn: AttrDefnFormControl): void {
+    console.log('addLinkTarget attrdefn', attrdefn);
+    this.router.navigate(['search', { 'typeId': attrdefn.targetTypeId, 'query': '*', 'select': `${this.thing.id}:${attrdefn.id}` }]);
   }
 }

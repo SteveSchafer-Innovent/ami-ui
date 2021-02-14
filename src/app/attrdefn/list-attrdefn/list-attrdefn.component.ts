@@ -86,6 +86,6 @@ export class ListAttrDefnComponent implements OnInit {
 
   gotoThings(): void {
     this.listThingContextService.setContext(null);
-    this.router.navigate(['list-thing', {typeId: this.type.id}]);
+    this.router.navigate(['search', { 'typeId': this.type.id, 'query': '*' }]);
   }
 }

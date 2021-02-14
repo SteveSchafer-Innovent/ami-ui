@@ -48,44 +48,39 @@
       </div>
       <table *ngIf="attrdefn.value.length > 0">
         <tr>
-          <th (click)="sortName()">Name</th>
-          <th (click)="sortCreated()">Created</th>
           <th *ngFor="let attrdefn of attrdefn.targetType.visibleAttrdefns" (click)="sort(attrdefn)">
-            {{attrdefn.name}}
+            {{ attrdefn.name | capitalize }}
           </th>
         </tr>
         <tr *ngFor="let thing of attrdefn.value">
-          <td>{{thing.presentation}}</td>
-          <td>{{thing.created | date: 'yyyy-MM-dd'}}</td>
-            <td *ngFor="let attrdefn of attrdefn.targetType.visibleAttrdefns">
-              <ngContainer *ngIf="attrdefn.editInList">
-                <input type="text" *ngIf="attrdefn.handler == 'string'" [value]="thing.attributes[attrdefn.name].value"
-                  class="string" (change)="change(thing, attrdefn, $event.target.value)">
-                <input type="text" *ngIf="attrdefn.handler == 'url'" [value]="thing.attributes[attrdefn.name].value"
-                  class="url" (change)="change(thing, attrdefn, $event.target.value)">
-                <input type="text" *ngIf="attrdefn.handler == 'float'" [value]="thing.attributes[attrdefn.name].value"
-                  (change)="change(thing, attrdefn, $event.target.value)">
-                <input type="text" *ngIf="attrdefn.handler == 'integer'" [value]="thing.attributes[attrdefn.name].value"
-                  (change)="change(thing, attrdefn, $event.target.value)">
-                <input type="checkbox" *ngIf="attrdefn.handler == 'boolean'" value="true"
-                  [checked]="thing.attributes[attrdefn.name].value ? 'checked' : ''"
-                  (change)="change(thing, attrdefn, $event.target.checked)">
-              </ngContainer>
-              <ngContainer *ngIf="attrdefn.showInList && !attrdefn.editInList">
-                <div *ngIf="attrdefn.handler == 'string' || attrdefn.handler == 'url' || attrdefn.handler == 'float' || attrdefn.handler == 'integer'">{{thing.attributes[attrdefn.name].value}}</div>
-                <div *ngIf="attrdefn.handler == 'boolean'">{{thing.attributes[attrdefn.name].value ? 'true' : 'false'}}</div>
-              </ngContainer>
-            </td>
+          <td *ngFor="let attrdefn of attrdefn.targetType.visibleAttrdefns">
+            <ngContainer *ngIf="attrdefn.editInList">
+              <input type="text" *ngIf="attrdefn.handler == 'string'" [value]="thing.attributes[attrdefn.name].value"
+                class="string" (change)="change(thing, attrdefn, $event.target.value)">
+              <input type="text" *ngIf="attrdefn.handler == 'url'" [value]="thing.attributes[attrdefn.name].value"
+                class="url" (change)="change(thing, attrdefn, $event.target.value)">
+              <input type="text" *ngIf="attrdefn.handler == 'float'" [value]="thing.attributes[attrdefn.name].value"
+                (change)="change(thing, attrdefn, $event.target.value)">
+              <input type="text" *ngIf="attrdefn.handler == 'integer'" [value]="thing.attributes[attrdefn.name].value"
+                (change)="change(thing, attrdefn, $event.target.value)">
+              <input type="checkbox" *ngIf="attrdefn.handler == 'boolean'" value="true"
+                [checked]="thing.attributes[attrdefn.name].value ? 'checked' : ''"
+                (change)="change(thing, attrdefn, $event.target.checked)">
+            </ngContainer>
+            <ngContainer *ngIf="attrdefn.showInList && !attrdefn.editInList">
+              <div *ngIf="attrdefn.handler == 'string' || attrdefn.handler == 'url' || attrdefn.handler == 'float' || attrdefn.handler == 'integer'">
+                {{ thing.attributes[attrdefn.name] ? thing.attributes[attrdefn.name].value : '?' }}
+              </div>
+              <div *ngIf="attrdefn.handler == 'boolean'">{{thing.attributes[attrdefn.name].value ? 'true' : 'false'}}</div>
+            </ngContainer>
+          </td>
           <td style="width: 1.6in;">
             <button class="btn btn-success" (click)="view(thing, attrdefn)" style="margin-left: 0px;"> View</button>
             <button class="btn btn-success" (click)="unlink(thing, attrdefn)" style="margin-left: 5px;"> Unlink</button>
           </td>
         </tr>
       </table>
-      <div *ngFor="let thing of attrdefn.value">
-        <!-- duplicate list-thing -->
-        <!-- <a [routerLink]="['/view-thing', {thingId: thing.id}]">{{thing.presentation}}</a> -->
-      </div>
+      <button class="btn btn-success" *ngIf="attrdefn.multiple || attrdefn.value.length == 0" (click)="addLinkTarget(attrdefn)">Add</button>
     </div>
     <div class="attrdefn-value" *ngIf="attrdefn.handler == 'rich-text'" [innerHTML]="attrdefn.value" class="rich-text">
     </div>
@@ -128,6 +123,7 @@
     <button class="btn btn-success" type="button" (click)="gotoThings()">
       {{(type ? type.name : '?') | pluralize | capitalize}}</button>
     <button class="btn btn-success" type="button" (click)="gotoEditor()">Edit</button>
+    <button class="btn btn-success" type="button" (click)="delete()">Delete</button>\
     <button *ngFor="let linktomeAttrDefn of linktomeAttrDefns" class="btn btn-success" type="button"
       (click)="gotoLinkType(linktomeAttrDefn)">{{linktomeAttrDefn.buttonName}}</button>
   </div>

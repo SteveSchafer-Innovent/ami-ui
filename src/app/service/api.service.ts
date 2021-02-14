@@ -12,6 +12,7 @@ import { User } from "../model/user.model";
 import { Thing } from "../model/thing.model";
 import { AttrDefn } from "../model/attrdefn.model";
 import { Attribute } from "../model/attribute.model";
+import { ListThingContext } from "../service/list-thing-context.service";
 
 @Injectable()
 export class ApiService {
@@ -142,7 +143,6 @@ export class ApiService {
   }
 
   getThingAttribute(thingId: number, attrDefnId: number) {
-    // console.log(`getThingAttribute ${thingId}, ${attrDefnId}`);
     return this.http.get<ApiResponse>(`${this.baseUrl}/thing/attribute/${thingId}/${attrDefnId}`).pipe(
       catchError(val => {
         this.handleError(val);
@@ -152,7 +152,6 @@ export class ApiService {
   }
 
   getThingAttributes(thingId: number) {
-    // console.log(`getAttributes ${thingId}`);
     return this.http.get<ApiResponse>(`${this.baseUrl}/thing/attributes/${thingId}`).pipe(
       catchError(val => {
         this.handleError(val);
@@ -180,11 +179,16 @@ export class ApiService {
     );
   }
 
-  search(args: {typeId: string, attrDefnId: string, query: string}): Observable<ApiResponse> {
+  search(args: {typeId: string, attrDefnId: string, query: string}, context: ListThingContext): Observable<ApiResponse> {
     let requests: any[] = [];
     let attrDefnId = args.attrDefnId == '' ? null : +args.attrDefnId;
     let typeId = args.typeId == '' ? null : +args.typeId;
     let request: any = {op: "any", typeId: typeId, attrDefnId: attrDefnId, query: args.query};
+    if(context) {
+      request['contextAttrDefnId'] = context.linkAttrDefn.id;
+      request['contextThingId'] = context.linkedThing.id;
+    }
+    console.log("search", request);
     requests.push(request);
     return this.http.post<ApiResponse>(`${this.baseUrl}/search`, requests).pipe(
       catchError(val => {

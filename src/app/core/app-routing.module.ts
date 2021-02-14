@@ -11,7 +11,6 @@ import { ListTypeComponent } from "../type/list-type/list-type.component";
 import { EditTypeComponent } from "../type/edit-type/edit-type.component";
 import { ListAttrDefnComponent } from "../attrdefn/list-attrdefn/list-attrdefn.component";
 import { EditAttrDefnComponent } from "../attrdefn/edit-attrdefn/edit-attrdefn.component";
-import { ListThingComponent } from "../thing/list-thing/list-thing.component";
 import { EditThingComponent } from "../thing/edit-thing/edit-thing.component";
 import { ViewThingComponent } from "../thing/view-thing/view-thing.component";
 import { SearchComponent } from '../search/search.component';
@@ -27,7 +26,6 @@ const routes: Routes = [
   { path: 'edit-type', component: EditTypeComponent },
   { path: 'list-attrdefn', component: ListAttrDefnComponent },
   { path: 'edit-attrdefn', component: EditAttrDefnComponent },
-  { path: 'list-thing', component: ListThingComponent },
   { path: 'edit-thing', component: EditThingComponent },
   { path: 'view-thing', component: ViewThingComponent },
   { path: 'search', component: SearchComponent },

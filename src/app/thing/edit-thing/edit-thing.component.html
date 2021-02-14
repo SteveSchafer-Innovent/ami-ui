@@ -3,7 +3,7 @@
   <form [formGroup]="form" (ngSubmit)="onSubmit()">
     <div class="form-group" *ngFor="let attrdefn of attrdefns; trackBy: trackAttrDefn">
       <div class="name" *ngIf="attrdefn.handler != 'link'">
-        {{attrdefn.name}}
+        <label>{{attrdefn.name}}</label>
       </div>
       <div class="value">
         <input type="text" [formControl]="attrdefn.formControl" *ngIf="attrdefn.handler == 'string'"
@@ -54,12 +54,6 @@
         <ckeditor *ngIf="attrdefn.handler == 'rich-text'" [editor]="Editor"
           [(ngModel)]="attrdefn.richTextModel.editorData" [ngModelOptions]="{standalone: true}"
           [config]="editorConfig"></ckeditor>
-        <div [formArray]="attrdefn.formArray" *ngIf="attrdefn.handler == 'link' && false" class="links">
-          <div *ngFor="let formControl of attrdefn.formArray.controls">
-            {{formControl.value}}
-            <input type="text" [formControl]="formControl" placeholder="thing id">
-          </div>
-        </div>
       </div>
     </div>
     <button class="btn btn-success" type="submit">Submit</button>

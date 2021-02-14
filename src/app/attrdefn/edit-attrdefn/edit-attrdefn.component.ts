@@ -64,7 +64,7 @@ export class EditAttrDefnComponent implements OnInit {
           return;
         }
         this.types = data.result;
-        this.types.push({id: 0, name: "any", sourceLinkCount: 0, targetLinkCount: 0, thingCount: 0, attrCount: 0});
+        this.types.push({id: 0, name: "any", presentation: "", sourceLinkCount: 0, targetLinkCount: 0, thingCount: 0, attrCount: 0});
         console.log('types', this.types);
         this.route.paramMap.subscribe((params: ParamMap) => {
           let id = +params.get('id');

@@ -27,7 +27,8 @@ export class EditTypeComponent implements OnInit {
     }
     this.form = this.formBuilder.group({
       id: [],
-      name: ['']
+      name: [''],
+      presentation: ['']
     });
     this.route.paramMap.subscribe((params: ParamMap) => {
       let id = +params.get('id');
@@ -38,6 +39,7 @@ export class EditTypeComponent implements OnInit {
           this.type = data.result;
           this.form.controls['id'].setValue(this.type.id);
           this.form.controls['name'].setValue(this.type.name);
+          this.form.controls['presentation'].setValue(this.type.presentation);
           console.log(this.form.value);
         });
       }

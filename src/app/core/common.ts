@@ -18,6 +18,9 @@ export function pluralize(input: string): string {
     if(input.endsWith('e')) {
       return input + 's';
     }
+    if(input.endsWith('y')) {
+      return input.substring(0, input.length - 1) + 'ies';
+    }
     for(let vowel of ['a', 'i', 'o', 'u', 's']) {
       if(input.endsWith(vowel)) {
         return input + 'es';

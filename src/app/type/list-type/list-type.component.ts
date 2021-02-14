@@ -83,7 +83,7 @@ export class ListTypeComponent implements OnInit {
   }
 
   things(type: Type): void {
-    this.router.navigate(['list-thing', { 'typeId': type.id }]);
+    this.router.navigate(['search', { 'typeId': type.id, 'query': '*' }]);
   }
 
   drop(event: CdkDragDrop<string[]>) {

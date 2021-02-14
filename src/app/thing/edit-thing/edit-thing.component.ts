@@ -24,8 +24,8 @@ class AttrDefnFormControl extends AttrDefn {
 
 class LinkAttrDefnFormControl extends AttrDefnFormControl {
   targetTypeId: number;
-  formArray: FormArray;
   multiple: boolean;
+  things: FindThingResult[];
 }
 
 class RichTextAttrDefnFormControl extends AttrDefnFormControl {
@@ -146,7 +146,7 @@ export class EditThingComponent implements OnInit {
   initializeForEdit(thingId: number): void {
     this.form.addControl('id', new FormControl(thingId));
     this.apiService.getThing(thingId).subscribe( data => {
-      console.log('getThing', thingId, data);
+      console.log('initializeForEdit getThing', thingId, data);
       if(data.status != 200) {
         alert(`Failed to get thing ${thingId}: ${data.message}`);
         return;
@@ -176,21 +176,16 @@ export class EditThingComponent implements OnInit {
       }
       this.attrdefns = data.result;
       for(let attrdefn of this.attrdefns) {
-        // console.log('attrdefn', attrdefn);
         let attribute = thing.attributes[attrdefn.name];
-        // console.log('attribute', attribute);
         let value;
         if(attribute) {
           value = attribute.value;
           if(attrdefn.handler == 'datetime') {
-            // console.log(`datetime value = ${value}, typeof = ${typeof value}`);
             // 2020-11-24T00:11:19.000+0000
             value = new Date(value);
-            // console.log(`datetime value = ${value}, typeof = ${typeof value}`);
           }
         }
         else {
-          // console.log('attribute value not found');
           if(attrdefn.handler == 'link') {
             value = [];
           }
@@ -212,24 +207,8 @@ export class EditThingComponent implements OnInit {
       (attrdefn as RichTextAttrDefnFormControl).richTextModel = value;
     }
     if(attrdefn.handler == 'link') {
-      let form = this.form;
-      let formArray = new FormArray([]);
-      if((attrdefn as LinkAttrDefnFormControl).multiple) {
-        for(let oneValue of value) {
-          formArray.push(this.createFormControl(attrdefn, +oneValue));
-        }
-        formArray.push(this.createFormControl(attrdefn, 0));
-      }
-      else {
-        if(value.length > 0) {
-          formArray.push(this.createFormControl(attrdefn, +value[0]));
-        }
-        else {
-          formArray.push(this.createFormControl(attrdefn, 0));
-        }
-      }
-      this.form.addControl(attrdefn.name, formArray);
-      (attrdefn as LinkAttrDefnFormControl).formArray = formArray;
+      let linkAttrDefn = attrdefn as LinkAttrDefnFormControl;
+      this.loadLinkTargetThings(linkAttrDefn, value);
     }
     else {
       let formControl = new FormControl(value, Validators.required);
@@ -257,33 +236,56 @@ export class EditThingComponent implements OnInit {
     }
   }
 
-  createFormControl(attrdefn, thingId): FormControl {
-    let formControl = new FormControl(thingId, Validators.required);
-    formControl.valueChanges.subscribe(thingId => {
-      // console.log(`link control valueChanges thingId = ${thingId}`);
-      let formArray = this.form.controls[attrdefn.name] as FormArray; // array of thing ids
-      let thingIds = {}; // to eliminate duplicates
-      let i = 0;
-      while(i < formArray.length) {
-        let formControl = formArray.controls[i];
-        if(formControl.value == 0) {
-          formArray.removeAt(i);
-        }
-        else if(thingIds[formControl.value]) {
-          formArray.removeAt(i);
-        }
-        else {
-          thingIds[formControl.value] = true;
-          i++;
-        }
+  loadLinkTargetThings(attrdefn: LinkAttrDefnFormControl, thingIds: number[]): void {
+    attrdefn.things = [];
+    let component = this;
+    let loadThings = function(index: number) {
+      if(index >= thingIds.length) {
+        return;
       }
-      if((attrdefn as LinkAttrDefnFormControl).multiple || formArray.length == 0) {
-        formArray.push(this.createFormControl(attrdefn, 0));
+      let thingId = thingIds[index];
+      component.apiService.getThing(thingId).subscribe( data => {
+        console.log('loadThings getThing', thingId, data);
+        if(data.status != 200) {
+          alert(`Failed to get thing ${thingId}: ${data.message}`);
+          return;
+        }
+        let thing = new FindThingResult(component.apiService, data.result);
+        thing.init().subscribe( thing => {
+          attrdefn.things[index] = thing;
+          loadThings(index + 1);
+        });
+      });
+    };
+    loadThings(0);
+  }
+
+  gotoTargetThing(thing: FindThingResult) {
+    this.router.navigate(['view-thing', { thingId: thing.id }]);
+  }
+
+  unlinkTargetThing(attrdefn: LinkAttrDefnFormControl, thing: FindThingResult) {
+    let newThings: FindThingResult[] = [];
+    for(let i = 0; i < attrdefn.things.length; i++) {
+      let linkedThing = attrdefn.things[i];
+      if(linkedThing.id != thing.id ) {
+        newThings.push(attrdefn.things[i]);
       }
-      this.form.controls[attrdefn.name] = formArray;
-    });
-    return formControl;
-  };
+    }
+    attrdefn.things = newThings;
+  }
+
+  addLinkTarget(attrdefn: LinkAttrDefnFormControl): void {
+    console.log('addLinkTarget attrdefn', attrdefn);
+    let formValue = this.form.value;
+    let thingId = formValue.id;
+    if(thingId && thingId != '') {
+      this.router.navigate(['search', { 'typeId': attrdefn.targetTypeId, 'query': '*', 'select': `${thingId}:${attrdefn.id}` }]);
+    }
+    else {
+      alert('You must add this thing before you can link it.')
+    }
+  }
 
   getTypeName(): string {
     if(this.type) {
@@ -374,7 +376,7 @@ export class EditThingComponent implements OnInit {
           let filesToUpload = fileAttrDefn.filesToUpload;
           attribute.value = null;
           if(filesToUpload == null || filesToUpload.length == 0) {
-            // console.log('No files provided');
+            console.log('No files provided');
           }
           else if(filesToUpload.length >= 1)  {
             const file = filesToUpload[0];
@@ -407,10 +409,10 @@ export class EditThingComponent implements OnInit {
         }
         else {
           if(attrdefn.handler == 'link') {
-            let values = formValue[attrdefn.name];
+            let linkAttrDefn = attrdefn as LinkAttrDefnFormControl;
             attribute.value = [];
-            for(let value of values) {
-              attribute.value.push(+value);
+            for(let thing of linkAttrDefn.things) {
+              attribute.value.push(thing.id);
             }
           }
           else if(attrdefn.handler == 'rich-text') {
@@ -444,7 +446,7 @@ export class EditThingComponent implements OnInit {
       this.goBack();
     },
     error => {
-      // console.log(error);
+      console.log(error);
     });
   }
 
@@ -459,7 +461,13 @@ export class EditThingComponent implements OnInit {
       this.router.navigate(breadcrumb.getNav());
     }
     else {
-      this.router.navigate(['list-thing', { 'typeId': this.type.id }]);
+      let breadcrumb = this.breadcrumbs.pop();
+      if(breadcrumb) {
+        this.router.navigate(breadcrumb.getNav());
+      } 
+      else {
+        this.router.navigate(['search', { 'typeId': this.type.id, 'query': '*' }]);
+      }     
     }
   }
 }

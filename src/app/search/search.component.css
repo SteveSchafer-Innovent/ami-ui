@@ -6,14 +6,21 @@
 div.form-group label {
 	font-size: smaller;
 }
-div.type {
+div.type-select {
 	width: 2in;
 	float: left;
 	padding-right: 20px;
 }
 div.attribute {
 	width: 3in;
-	margin-left: 2in;
+	float: left;
+	padding-right: 20px;
+}
+div.add-button {
+	width: 1in;
+	margin-left: 5in;
+}
+div.query {
 }
 div.sorts {
 	width: 2in;
@@ -35,8 +42,11 @@ div.page input {
 	margin-left: 6px;
 	margin-right: 6px;
 }
-button.simple-btn {
+button.btn-simple {
 	border: 1px solid #ccc;
+}
+table {
+	width: 100%;
 }
 table tr td.buttons button:nth-child(n+2) {
 	margin-left: 6px;
@@ -44,6 +54,9 @@ table tr td.buttons button:nth-child(n+2) {
 table tr td.buttons {
 	white-space: nowrap;
 	text-align: right;
+}
+table tr td.buttons input[type=checkbox] {
+	margin-left: 20px;
 }
 table tr th {
 	vertical-align: middle;

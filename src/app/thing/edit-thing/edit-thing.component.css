@@ -3,7 +3,13 @@
   flex-direction: column;
   margin: auto;
 }
-
+.btn-simple {
+  border: 1px solid #ccc;
+}
+div.links div.link button {
+  margin-right: 10px;
+  margin-bottom: 10px;
+}
 .uploadfilecontainer {
     background-image: url("../../../assets/cloud-2044823_960_720.png");
     background-repeat: no-repeat;
@@ -17,37 +23,30 @@
     text-align: center;
     padding-top: 10px;
 }
-
 .uploadfilecontainer:hover {
     cursor: pointer;
     background-color: #9ecbec !important;
     opacity: 0.8;
 }
-
 input.string {
 	width: 100%;
 }
-
 input.url {
 	width: 100%;
 }
-
 textarea {
 	width: 100%;
 	padding-top: 5px;
 	padding-left: 10px;
 }
-
 :host ::ng-deep .ck-editor__editable_inline {
     min-height: 200px;
 }
-
 div.rich-text {
   height: 200px;
   overflow: auto;
   border: 1px solid #ccc;
 }
-
 div.name {
 	font-size: small;
 }

@@ -46,6 +46,9 @@ export function getType(apiService: ApiService, typeId: number): Observable<MyTy
 let myThingCache = {};
 
 export function getThing(apiService: ApiService, thing: Thing): Observable<FindThingResult> {
+  if(thing == null) {
+    return null;
+  }
   if(myThingCache[thing.id]) {
     return of(myThingCache[thing.id]);
   }
@@ -63,6 +66,7 @@ export class FindThingResult {
   creator: User;
   name: string;
   attributes: any[] = [];
+  attributesById: {} = {};
   image: any;
   parent: FindThingResult;
   presentation: string;
@@ -88,15 +92,14 @@ export class FindThingResult {
       this.type = myType;
       return from(myType.attrdefns);
     })).pipe(mergeMap( attrdefn => {
-      // console.log('FindThingResult.init: attrdefn', attrdefn);
       return this.apiService.getThingAttribute(this.id, attrdefn.id);
     })).pipe(switchMap( data => {
-      // console.log(`FindThingResult.init: getThingAttribute ${this.id}, data`, data);
       if(data.status != 200) {
         alert(`Failed getThingAttribute ${this.id}: ${data.message}`);
         return;
       }
       this.attributes[data.result.name] = data.result;
+      this.attributesById[data.result.id] = data.result;
       return of(this);
     }), takeLast(1)).pipe(switchMap( thing => {
       return this.apiService.getThingName(thing.id);
@@ -107,7 +110,31 @@ export class FindThingResult {
         return;
       }
       this.name = data.result;
-      return this.apiService.getThingPresentation(this.id);
+      let presentationExp = this.type.presentation;
+      if(presentationExp && presentationExp != '') {
+        let exp = [];
+        for(let attrName in this.attributes) {
+          let attrValueString: string = JSON.stringify(this.attributes[attrName].value);
+          exp.push(`let ${attrName} = ${attrValueString};`);
+        }
+        exp.push(presentationExp);
+        let expString = exp.join("\n");
+        // console.log('exp:', expString, this.attributes);
+        this.presentation = eval(expString);
+      }
+      else {
+        let name = this.attributes['name'];
+        if(name && name.value) {
+          this.presentation = name.value;
+        }
+        else if(this.type) {
+          this.presentation = `${this.type.name} ${this.id}`;
+        }
+        else {
+          this.presentation = `? ${this.id}`;
+        }
+      }
+      /* return this.apiService.getThingPresentation(this.id);
     })).pipe(switchMap(data => {
       // console.log(`FindThingResult.init: getThingPresentation ${this.id}, data`, data);
       if(data.status != 200) {
@@ -116,7 +143,7 @@ export class FindThingResult {
       }
       // console.log(`thing ${this.id} presentation = ${data.result}`);
       this.presentation = data.result;
-      return this.apiService.getThingParent(this.id).pipe(switchMap(data => {
+      */ return this.apiService.getThingParent(this.id).pipe(switchMap(data => {
         // console.log(`getThingParent ${this.id}, data`, data);
         if(data.status != 200) {
           alert(`Failed to get parent of thing ${this.id}: ${data.message}`);
